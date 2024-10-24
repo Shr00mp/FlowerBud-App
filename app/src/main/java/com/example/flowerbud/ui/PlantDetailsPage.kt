@@ -102,7 +102,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
 //                            ),
                             modifier = Modifier
                                 .height(55.dp)
-                                .width(400.dp)
+                                .width(450.dp)
                         ) {
                             Text(
                                 text = if (isMyPlant) "Remove from My Plants" else "Add to My Plants",
