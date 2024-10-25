@@ -1,28 +1,27 @@
 package com.example.flowerbud.ui
 
-import android.graphics.Typeface
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,32 +30,103 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.flowerbud.R
+import com.squareup.wire.get
 
+fun getPlants(
+    priceStart: Int, priceEnd: Int,
+    waterStart: Int, waterEnd: Int,
+    spaceStart: Int, spaceEnd: Int,
+    lightStart: Int, lightEnd: Int,
+    toxic_yn: Boolean,
+    outdoor: Boolean
+): MutableList<Plant> {
+    val allScores = MutableList(11) { 0 }
+    for (i in 0 .. 10) {
+        val plant = allPlants[i]
+        if (plant.price in priceStart..priceEnd) {
+            allScores[i] += 1
+        }
+        if (plant.waterWeek in waterStart..waterEnd) {
+            allScores[i] += 1
+        }
+        if (plant.space in spaceStart..spaceEnd) {
+            allScores[i] += 1
+        }
+        if (plant.light in lightStart..lightEnd) {
+            allScores[i] += 1
+        }
+        if (plant.toxic == toxic_yn) {
+            allScores[i] += 1
+        }
+        if (plant.outdoor == outdoor) {
+            allScores[i] += 1
+        }
+    }
+    val top5Indexes: List<Int> = allScores
+        .withIndex()                     // Pair each score with its index
+        .sortedByDescending { it.value } // Sort by score in descending order
+        .take(5)                         // Take the top 5 elements
+        .map { it.index }                // Extract the indexes
+    val top5Plants = mutableListOf<Plant>()
+    for (index in top5Indexes) {
+        top5Plants.add(allPlants[index])
+    }
+    return top5Plants
+}
 
 @Composable
 fun FilterPage(
     navController: NavController,
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier,
-){
+) {
+    var content by remember{ mutableStateOf("Quiz") }
+    var top5Plants = remember{ mutableStateListOf<Plant>() }
+    if (content == "Quiz") {
+        QuizContent(navController = navController, plantViewModel = plantViewModel, top5Plants, onContentChange = { content = it })
+    }
+    else {
+        ResultsContent(navController = navController, plantViewModel = plantViewModel, top5Plants, onContentChange = { content = it })
+    }
+}
+
+@Composable
+fun QuizContent(
+    navController: NavController,
+    plantViewModel: PlantViewModel,
+    top5Plants: MutableList<Plant>,
+    onContentChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val customFont = FontFamily(
         Font(R.font.plus_font)
     )
+    var price_start by remember { mutableStateOf(0) }
+    var price_end by remember { mutableStateOf(50) }
+    var water_start by remember { mutableStateOf(1) }
+    var water_end by remember { mutableStateOf(4) }
+    var space_start by remember { mutableStateOf(1) }
+    var space_end by remember { mutableStateOf(5) }
+    var light_start by remember { mutableStateOf(1) }
+    var light_end by remember { mutableStateOf(3) }
+    var toxic_yn by remember { mutableStateOf(false) }
+    var outdoor by remember { mutableStateOf(false) }
     ConstraintLayout {
-        val submitBtnRef = createRef();
+        val submitBtnRef = createRef()
         val greenColour = Color(0xFF70805d)
         val purpleColour = Color(0xFF96a7b6)
         val grayColour = Color(0xFFcbc8c4)
 
-        Column(modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .background(color = Color.White)) {
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .background(color = Color.White)
+        ) {
             Row(modifier = modifier.align(alignment = Alignment.CenterHorizontally)) {
                 Text(
                     text = "Plant Quiz",
@@ -82,8 +152,6 @@ fun FilterPage(
             )
 
             var sliderPosition1 by remember { mutableStateOf(0f..50f) }
-            var price_start by remember { mutableStateOf(0) };
-            var price_end by remember { mutableStateOf(50) };
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
@@ -118,8 +186,6 @@ fun FilterPage(
             )
 
             var sliderPosition2 by remember { mutableStateOf(1f..4f) }
-            var water_start by remember { mutableStateOf(1) };
-            var water_end by remember { mutableStateOf(4) };
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
@@ -147,7 +213,7 @@ fun FilterPage(
             }
 
             Text(
-                text = "On a scale from 1 to 5, how much space do you have for your plant?",
+                text = "On a scale from 1 to 5, how much space would you want your plant to take up?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
                 fontSize = 25.sp,
                 style = MaterialTheme.typography.headlineSmall
@@ -158,8 +224,6 @@ fun FilterPage(
             )
 
             var sliderPosition3 by remember { mutableStateOf(1f..5f) }
-            var space_start by remember { mutableStateOf(1) };
-            var space_end by remember { mutableStateOf(5) };
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
@@ -198,8 +262,6 @@ fun FilterPage(
             )
 
             var sliderPosition4 by remember { mutableStateOf(1f..3f) }
-            var light_start by remember { mutableStateOf(1) };
-            var light_end by remember { mutableStateOf(3) };
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
@@ -233,7 +295,6 @@ fun FilterPage(
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            var toxic_yn by remember { mutableStateOf(false) }
             val yesButtonColourT = remember { mutableStateOf(grayColour) }
             val yesButtonTextColourT = remember { mutableStateOf(Color.Gray) }
             val noButtonColourT = remember { mutableStateOf(grayColour) }
@@ -309,7 +370,6 @@ fun FilterPage(
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            var indoorOutdoor by remember { mutableStateOf(false) }
             val indoorButtonColour = remember { mutableStateOf(grayColour) }
             val indoorButtonTextColour = remember { mutableStateOf(Color.Gray) }
             val outdoorButtonColour = remember { mutableStateOf(grayColour) }
@@ -331,7 +391,7 @@ fun FilterPage(
                 ) {
                     Button(
                         onClick = {
-                            indoorOutdoor = true
+                            outdoor = false
                             indoorButtonColour.value = greenColour
                             indoorButtonTextColour.value = Color.White
                             outdoorButtonColour.value = grayColour
@@ -354,7 +414,7 @@ fun FilterPage(
                     }
                     Button(
                         onClick = {
-                            indoorOutdoor = false
+                            outdoor = true
                             indoorButtonColour.value = grayColour
                             indoorButtonTextColour.value = Color.Gray
                             outdoorButtonColour.value = greenColour
@@ -377,6 +437,7 @@ fun FilterPage(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(50.dp))
         }
 
         Row(
@@ -385,21 +446,90 @@ fun FilterPage(
             modifier = modifier
                 .fillMaxWidth()
                 .constrainAs(submitBtnRef) {
-                bottom.linkTo(parent.bottom, margin = 5.dp)
-            }
+                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                }
         ) {
             Button(
-                onClick = { /* TODO */},
+                onClick = {
+                    top5Plants.clear()
+                    val top5Results = getPlants(price_start, price_end,
+                    water_start, water_end,
+                    space_start, space_end,
+                    light_start, light_end,
+                    toxic_yn, outdoor)
+                    top5Plants.addAll(top5Results)
+                    onContentChange("Results")
+                          },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purpleColour,
                     contentColor = Color.White
                 ),
                 modifier = Modifier
-                    .height(50.dp)
+                    .height(70.dp)
                     .width(300.dp)
             ) {
                 Text("Get Results", fontSize = 25.sp)
             }
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
+}
+
+@Composable
+fun ResultsContent(
+    navController: NavController,
+    plantViewModel: PlantViewModel,
+    top5Plants: MutableList<Plant>,
+    onContentChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ConstraintLayout {
+        val retakeBtnRef = createRef()
+        Column (
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .background(color = Color.White)
+                .padding(10.dp, 0.dp)
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Row(
+                modifier = Modifier.padding(20.dp, 0.dp)
+            ){
+                Text("Your top 5 results:", fontSize = 40.sp)
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            for (plant in top5Plants) {
+                PlantCard(plant = plant, navController = navController)
+            }
+            Spacer(modifier = Modifier.height(95.dp))
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .constrainAs(retakeBtnRef) {
+                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                }
+        ) {
+            Button(
+                onClick = {
+                    top5Plants.clear()
+                    onContentChange("Quiz")
+                },
+//            colors = ButtonDefaults.buttonColors(
+//                containerColor = purpleColour,
+//                contentColor = Color.White
+//            ),
+                modifier = Modifier
+                    .height(70.dp)
+                    .width(300.dp)
+            ) {
+                Text("Retake Quiz", fontSize = 25.sp)
+            }
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+
+
 }
