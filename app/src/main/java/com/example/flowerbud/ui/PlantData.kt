@@ -86,10 +86,12 @@ val allPlants: List<Plant> = listOf(
         "Water sparingly, allowing the soil to dry out between waterings. Provide the plant with moderate indirect light, and ensure the pot has good drainage to avoid water accumulation at the roots."),
 )
 
+// Returns all plants that fit user search (query)
 fun getPlantsBySearch(query: String): List<Plant> {
     if (query.isEmpty()) {
         return listOf()
     }
+    // Returns all plants that contain the user search
     return allPlants.filter { plant -> plant.name.contains(query, ignoreCase = true) }
 }
 

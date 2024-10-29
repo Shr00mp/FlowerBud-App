@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.flowerbud.R
-import com.squareup.wire.get
 
 fun getPlants(
     priceStart: Int, priceEnd: Int,
@@ -80,7 +79,7 @@ fun getPlants(
 }
 
 @Composable
-fun FilterPage(
+fun QuizPage(
     navController: NavController,
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier,

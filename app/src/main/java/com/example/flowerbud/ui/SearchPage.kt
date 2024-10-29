@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.flowerbud.R
 
+
+// Function for the search bar
 @Composable
 fun SearchBar(
     query: String,
@@ -54,19 +56,19 @@ fun SearchBar(
     // OutlinedTextField for the search bar appearance
     OutlinedTextField(
         shape = RoundedCornerShape(20.dp),
-        value = query, // The current text in the search bar
+        value = query, // The current text in the search bar (initialised as "", changes as user types)
         onValueChange = { newQuery ->
-            onQueryChanged(newQuery) // Update the query whenever the text changes
+            onQueryChanged(newQuery) // Call onSearch(newQuery)
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp), // Adding some padding around the search bar
-        label = { Text("Search") }, // Placeholder or label text
+            .padding(16.dp),
+        label = { Text("Search") }, // Placeholder text
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search Icon"
-            )
+            ) // Search icon at the beginning of search bar
         },
         singleLine = true, // Make the search bar single line
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -80,6 +82,8 @@ fun SearchBar(
     )
 }
 
+
+// Function to show plant cards for different plants
 @Composable
 fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavController) {
     Card(
@@ -88,21 +92,25 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
             .height(200.dp)
             .padding(20.dp, 10.dp)
             .clickable {
+                // When clicked, navigate to PlantDetailsPage(id = plant.plantId)
                 navController.navigate(route = "details/${plant.plantId}")
             },
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
         Row(modifier = Modifier.align(Alignment.Start)) {
+            // Image of plant
             Image(
                 painter = painterResource(id = plant.image),
                 contentDescription = plant.name,
             )
             Column() {
+                // Name of plant
                 Text(
                     text = plant.name,
                     fontSize = 30.sp,
                     modifier = Modifier.absolutePadding(20.dp, 20.dp)
                 )
+                // Description of plant
                 Text(
                     text = plant.description,
                     fontSize = 20.sp,
@@ -110,8 +118,8 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 Row() {
+                    // Icon(s) representing light requirements
                     Card(
                         modifier = Modifier
                             .height(40.dp)
@@ -121,10 +129,10 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                     ) {
                         Image(
                             painter = painterResource(id = plant.lightImage),
-                            contentDescription = "Light needed icon"
+                            contentDescription = "Light intensity icon"
                         )
                     }
-
+                    // Icon(s) representing price
                     Card(
                         modifier = Modifier
                             .height(40.dp)
@@ -138,7 +146,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                         )
 
                     }
-
+                    // Icon(s) representing water requirements
                     Card(
                         modifier = Modifier
                             .height(40.dp)
@@ -148,7 +156,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                     ) {
                         Image(
                             painter = painterResource(id = plant.waterImage),
-                            contentDescription = "Pound icon"
+                            contentDescription = "Water icon"
                         )
                     }
                 }
@@ -159,12 +167,13 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
     }
 }
 
+// Function for entire search page, including search bar and possible plant cards
 @Composable
 fun SearchPage(navController: NavController, plantViewModel: PlantViewModel, modifier: Modifier = Modifier) {
-    var plantQuery by remember { mutableStateOf("") }
+    var plantQuery by remember { mutableStateOf("") } // For passing in a mutable "" value for query parameter in SearchBar()
     val selectedPlants = remember {
         mutableStateListOf(*allPlants.toTypedArray())
-    }
+    } // Stores plants that fit user search
     Column(
         modifier = Modifier
             .absolutePadding(10.dp, 15.dp, 10.dp, 10.dp)
@@ -172,10 +181,11 @@ fun SearchPage(navController: NavController, plantViewModel: PlantViewModel, mod
     ) {
         SearchBar(query = plantQuery, onQueryChanged = { q -> plantQuery = q }, onSearch = {
             selectedPlants.clear()
-            val plants = getPlantsBySearch(plantQuery)
-            selectedPlants.addAll(plants)
+            val plants = getPlantsBySearch(plantQuery) // plants = all plants that fit user search
+            selectedPlants.addAll(plants) // Add all plants that fit user search to selectedPlants
         })
         Spacer(modifier = Modifier.padding(0.dp, 15.dp))
+        // For each plant that fits user search, display plant card
         for (plant in selectedPlants) {
             PlantCard(plant = plant, navController = navController)
         }

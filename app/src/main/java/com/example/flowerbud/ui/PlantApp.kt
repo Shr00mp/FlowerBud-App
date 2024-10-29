@@ -39,7 +39,7 @@ fun PlantApp(
                 HomePage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
             }
             composable(route = PlantScreens.Quiz.title) {
-                FilterPage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
+                QuizPage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
             }
             composable(route = PlantScreens.Search.title) {
                 SearchPage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
