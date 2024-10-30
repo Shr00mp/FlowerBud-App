@@ -35,12 +35,16 @@ fun ProfilePage(
     modifier: Modifier = Modifier
 ) {
     val uiState by plantViewModel.uiState.collectAsState()
-    val favoritePlants: List<Plant> =
+    // favouritePlants stores all <Plant>s in Favourites
+    val favouritePlants: List<Plant> =
         uiState.favourites.map { plantId -> allPlants.find { it.plantId == plantId }!! }
+    // // myPlants stores all <Plant>s in My Plants
     val myPlants: List<Plant> =
         uiState.myPlants.map { userPlant -> allPlants.find { it.plantId == userPlant.plantId }!! }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.width(40.dp))
+        // Profile image and "Welcome back" text
         Image(
             painter = painterResource(id = R.drawable.profile),
             contentDescription = "Profile picture",
@@ -87,10 +91,10 @@ fun ProfilePage(
                 }
             }
 
-            // Content for each tab
+            // Content for each tab, specified using the Tab Index
             when (selectedTabIndex) {
                 0 -> TabContent(plantList = myPlants, navController = navController)
-                1 -> TabContent(plantList = favoritePlants, navController = navController)
+                1 -> TabContent(plantList = favouritePlants, navController = navController)
             }
         }
 

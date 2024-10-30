@@ -113,18 +113,26 @@ fun idToPlant(id: String?) : Plant {
     return allPlants[1]
 }
 
+// Class for data stored across different pages (i.e. ui state that can be accessed by entire app)
 data class PlantUiState(
     val favourites: List<String> = emptyList<String>(),
     val myPlants: List<UserPlant> = emptyList<UserPlant>()
 )
+// Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
     val plantId: String
 )
 
+/*
+PlantViewModel includes:
+1. UI state, which stores data that can be passed to composable functions
+2. Functions triggered by events in the UI element (e.g. "Add to My Plants" button) that alter UI state
+*/
 class PlantViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(PlantUiState())
     val uiState: StateFlow<PlantUiState> = _uiState.asStateFlow()
 
+    // Add to favourites list
     fun addToFavourites(plantId: String) {
         if (!_uiState.value.favourites.contains(plantId)) {
             val updatedFavourites = _uiState.value.favourites + plantId
@@ -132,11 +140,13 @@ class PlantViewModel: ViewModel() {
         }
     }
 
+    // Remove to favourites list
     fun removeFromFavourites(plantId: String) {
         val updatedFavourites = _uiState.value.favourites.filter{it != plantId}
         _uiState.update { currentState -> currentState.copy(favourites = updatedFavourites) }
     }
 
+    // Add to My plants list
     fun addToMyPlants(plantId: String) {
         if (!_uiState.value.myPlants.any {it.plantId == plantId}) {
             val updatedMyPlants = _uiState.value.myPlants + UserPlant(plantId)
@@ -144,6 +154,7 @@ class PlantViewModel: ViewModel() {
         }
     }
 
+    // Remove from My plants list
     fun removeFromMyPlants(plantId: String) {
         val updatedMyPlants = _uiState.value.myPlants.filter{ it.plantId != plantId }
         _uiState.update { currentState -> currentState.copy(myPlants = updatedMyPlants) }
