@@ -36,6 +36,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.flowerbud.R
 
+// Function to get the top 5 plants based on user's quiz selections
 fun getPlants(
     priceStart: Int, priceEnd: Int,
     waterStart: Int, waterEnd: Int,
@@ -45,6 +46,7 @@ fun getPlants(
     outdoor: Boolean
 ): MutableList<Plant> {
     val allScores = MutableList(11) { 0 }
+    // Calculates a score for each plant based on how many of the user's preference criteria it fits
     for (i in 0 .. 10) {
         val plant = allPlants[i]
         if (plant.price in priceStart..priceEnd) {
@@ -66,12 +68,14 @@ fun getPlants(
             allScores[i] += 1
         }
     }
+    // Gets the top 5 plants by index
     val top5Indexes: List<Int> = allScores
         .withIndex()                     // Pair each score with its index
         .sortedByDescending { it.value } // Sort by score in descending order
         .take(5)                         // Take the top 5 elements
         .map { it.index }                // Extract the indexes
     val top5Plants = mutableListOf<Plant>()
+    // Adds each of the top 5 plants to top5Plants<Plant> using the index
     for (index in top5Indexes) {
         top5Plants.add(allPlants[index])
     }
@@ -84,6 +88,7 @@ fun QuizPage(
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier,
 ) {
+    // var content used to indicate whether quiz or results page should be showing
     var content by remember{ mutableStateOf("Quiz") }
     var top5Plants = remember{ mutableStateListOf<Plant>() }
     if (content == "Quiz") {
@@ -105,6 +110,7 @@ fun QuizContent(
     val customFont = FontFamily(
         Font(R.font.plus_font)
     )
+    // Variables to store user choices
     var price_start by remember { mutableStateOf(0) }
     var price_end by remember { mutableStateOf(50) }
     var water_start by remember { mutableStateOf(1) }
@@ -115,8 +121,11 @@ fun QuizContent(
     var light_end by remember { mutableStateOf(3) }
     var toxic_yn by remember { mutableStateOf(false) }
     var outdoor by remember { mutableStateOf(false) }
+
     ConstraintLayout {
+        // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
         val submitBtnRef = createRef()
+
         val greenColour = Color(0xFF70805d)
         val purpleColour = Color(0xFF96a7b6)
         val grayColour = Color(0xFFcbc8c4)
@@ -143,6 +152,7 @@ fun QuizContent(
                 modifier = Modifier.absolutePadding(30.dp, 25.dp, 30.dp, 40.dp)
             )
 
+            // Price range section:
             Text(
                 text = "What is your price range?",
                 modifier = Modifier.absolutePadding(30.dp, 20.dp, 0.dp, 0.dp),
@@ -154,14 +164,15 @@ fun QuizContent(
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
+                // Price range slider
                 RangeSlider(
                     value = sliderPosition1,
                     steps = 4,
                     onValueChange = { range ->
                         run {
                             sliderPosition1 = range;
-                            price_start = range.start.toInt();
-                            price_end = range.endInclusive.toInt();
+                            price_start = range.start.toInt() // price_start updates to user's min choice
+                            price_end = range.endInclusive.toInt() // price_end updates to user's max choice
                         }
                     },
                     colors = SliderDefaults.colors(
@@ -169,14 +180,12 @@ fun QuizContent(
                         activeTrackColor = greenColour,
                     ),
                     valueRange = 0f..50f,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = {},
                 )
                 Text(text = "£" + price_start.toString() + " to " + "£" + price_end.toString())
             }
 
+            // Water frequency section:
             Text(
                 text = "How often would you like to water your plant?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
@@ -188,14 +197,15 @@ fun QuizContent(
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
+                // Water frequency slider
                 RangeSlider(
                     value = sliderPosition2,
                     steps = 2,
                     onValueChange = { range ->
                         run {
                             sliderPosition2 = range;
-                            water_start = range.start.toInt();
-                            water_end = range.endInclusive.toInt();
+                            water_start = range.start.toInt() // water_start updates to user's min choice
+                            water_end = range.endInclusive.toInt() // water_end updates to user's max choice
                         }
                     },
                     colors = SliderDefaults.colors(
@@ -203,14 +213,12 @@ fun QuizContent(
                         activeTrackColor = greenColour,
                     ),
                     valueRange = 1f..4f,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = {},
                 )
                 Text(text = "Every " + water_start.toString() + " to " + water_end.toString() + " weeks")
             }
 
+            // Space availability section:
             Text(
                 text = "On a scale from 1 to 5, how much space would you want your plant to take up?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
@@ -226,14 +234,15 @@ fun QuizContent(
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
+                // Space availability slider
                 RangeSlider(
                     value = sliderPosition3,
                     steps = 3,
                     onValueChange = { range ->
                         run {
                             sliderPosition3 = range;
-                            space_start = range.start.toInt();
-                            space_end = range.endInclusive.toInt();
+                            space_start = range.start.toInt() // space_start updates to user's min choice
+                            space_end = range.endInclusive.toInt() // space_end updates to user's max choice
                         }
                     },
                     colors = SliderDefaults.colors(
@@ -241,14 +250,12 @@ fun QuizContent(
                         activeTrackColor = greenColour,
                     ),
                     valueRange = 1f..5f,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = {},
                 )
                 Text(text = space_start.toString() + " to " + space_end.toString())
             }
 
+            // Light availability section:
             Text(
                 text = "On a scale from 1 to 3, how much light would your plant have access to?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
@@ -264,14 +271,15 @@ fun QuizContent(
             Column(
                 modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
             ) {
+                // Light availability slider
                 RangeSlider(
                     value = sliderPosition4,
                     steps = 1,
                     onValueChange = { range ->
                         run {
                             sliderPosition4 = range;
-                            light_start = range.start.toInt();
-                            light_end = range.endInclusive.toInt();
+                            light_start = range.start.toInt() // light_start variable updates to user's min choice
+                            light_end = range.endInclusive.toInt() // light_end variable updates to user's max choice
                         }
                     },
                     colors = SliderDefaults.colors(
@@ -279,14 +287,12 @@ fun QuizContent(
                         activeTrackColor = greenColour,
                     ),
                     valueRange = 1f..3f,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = {},
                 )
                 Text(text = light_start.toString() + " to " + light_end.toString())
             }
 
+            // Pets (determine if plant toxic or non-toxic) section:
             Text(
                 text = "Do you have pets a plant could be toxic to?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
@@ -313,6 +319,7 @@ fun QuizContent(
                         .fillMaxWidth()
                         .absolutePadding(0.dp, 5.dp)
                 ) {
+                    // Yes (for if there are pets) button
                     Button(
                         onClick = {
                             toxic_yn = true
@@ -336,6 +343,7 @@ fun QuizContent(
                     ) {
                         Text("Yes", fontSize = 25.sp)
                     }
+                    // No (for if there are pets) button
                     Button(
                         onClick = {
                             toxic_yn = false
@@ -362,6 +370,7 @@ fun QuizContent(
                 }
             }
 
+            // Indoor vs Outdoor section:
             Text(
                 text = "Would you like an indoor or outdoor plant?",
                 modifier = Modifier.absolutePadding(30.dp, 50.dp, 0.dp, 0.dp),
@@ -388,6 +397,7 @@ fun QuizContent(
                         .fillMaxWidth()
                         .absolutePadding(0.dp, 5.dp)
                 ) {
+                    // Indoor button
                     Button(
                         onClick = {
                             outdoor = false
@@ -411,6 +421,7 @@ fun QuizContent(
                     ) {
                         Text("Indoor", fontSize = 25.sp)
                     }
+                    // Outdoor button
                     Button(
                         onClick = {
                             outdoor = true
@@ -439,6 +450,7 @@ fun QuizContent(
             Spacer(modifier = Modifier.height(50.dp))
         }
 
+        // Row to contain floating Get Results button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -448,6 +460,7 @@ fun QuizContent(
                     bottom.linkTo(parent.bottom, margin = 5.dp)
                 }
         ) {
+            // Get Results button
             Button(
                 onClick = {
                     top5Plants.clear()
@@ -457,7 +470,7 @@ fun QuizContent(
                     light_start, light_end,
                     toxic_yn, outdoor)
                     top5Plants.addAll(top5Results)
-                    onContentChange("Results")
+                    onContentChange("Results") // content = "Results" so display changes to ResultsContent()
                           },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purpleColour,
@@ -483,6 +496,7 @@ fun ResultsContent(
     modifier: Modifier = Modifier,
 ) {
     ConstraintLayout {
+        // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
         val retakeBtnRef = createRef()
         Column (
             modifier = modifier
@@ -497,11 +511,15 @@ fun ResultsContent(
                 Text("Your top 5 results:", fontSize = 40.sp)
             }
             Spacer(modifier = Modifier.height(30.dp))
+
+            // Show plant cards for ever top 5 plant
             for (plant in top5Plants) {
                 PlantCard(plant = plant, navController = navController)
             }
             Spacer(modifier = Modifier.height(95.dp))
         }
+
+        // Row to contain floating Retake Quiz button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -511,10 +529,11 @@ fun ResultsContent(
                     bottom.linkTo(parent.bottom, margin = 5.dp)
                 }
         ) {
+            // Get Results button
             Button(
                 onClick = {
-                    top5Plants.clear()
-                    onContentChange("Quiz")
+                    top5Plants.clear() // Clear list of top 5 plants, ready for new user choices
+                    onContentChange("Quiz") // content = "Quiz" so display changes to QuizContent()
                 },
 //            colors = ButtonDefaults.buttonColors(
 //                containerColor = purpleColour,
@@ -529,6 +548,4 @@ fun ResultsContent(
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
-
-
 }
