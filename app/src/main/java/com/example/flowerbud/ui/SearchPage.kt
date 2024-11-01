@@ -46,41 +46,42 @@ import androidx.navigation.NavController
 import com.example.flowerbud.R
 
 
-// Function for the search bar
+// Function that creates a search bar composable
 @Composable
 fun SearchBar(
-    query: String,
-    onQueryChanged: (String) -> Unit,
-    onSearch: () -> Unit
+    query: String, // The current text in the search bar, dynamically updated as the user types
+    onQueryChanged: (String) -> Unit, // A callback function that handles changes in the search query (text input)
+    onSearch: () -> Unit // A callback function that triggers the search action when the user submits the search
 ) {
-    // OutlinedTextField for the search bar appearance
+    // OutlinedTextField resembles a search bar
     OutlinedTextField(
         shape = RoundedCornerShape(20.dp),
-        value = query, // The current text in the search bar (initialised as "", changes as user types)
-        onValueChange = { newQuery ->
-            onQueryChanged(newQuery) // Call onSearch(newQuery)
+        value = query, // Sets the current text in the field to the value of `query`, updated as the user types
+        onValueChange = { newQuery -> // Called every time the text changes
+            onQueryChanged(newQuery) // Calls the onQueryChanged function with the updated text. It updates query to newQuery (defined when SearchBar is called in SearchPage() below)
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        label = { Text("Search") }, // Placeholder text
+        label = { Text("Search for a plant") },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search Icon"
-            ) // Search icon at the beginning of search bar
+            )
         },
-        singleLine = true, // Make the search bar single line
+        singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search // Sets the keyboard action to "Search"
+            imeAction = ImeAction.Search
         ),
         keyboardActions = KeyboardActions(
             onSearch = {
-                onSearch() // Trigger the search action
+                onSearch() // Calls the onSearch function when the search button on the keyboard is pressed
             }
         )
     )
 }
+
 
 
 // Function to show plant cards for different plants
