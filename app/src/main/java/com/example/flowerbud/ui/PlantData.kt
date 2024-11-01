@@ -95,6 +95,7 @@ fun getPlantsBySearch(query: String): List<Plant> {
     return allPlants.filter { plant -> plant.name.contains(query, ignoreCase = true) }
 }
 
+// Constants to specify navigation routes
 enum class PlantScreens(var title: String) {
     Home(title = "Home"),
     Quiz(title = "Quiz"),

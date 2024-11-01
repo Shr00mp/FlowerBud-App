@@ -18,35 +18,41 @@ import androidx.navigation.NavDestination
 
 @Composable
 fun BottomNavigationBar(
-    currentDestination: NavDestination?,
-    onTabClick: (PlantScreens) -> Unit,
+    currentDestination: NavDestination?, // Determines the active tab
+    onTabClick: (PlantScreens) -> Unit, // Handles tab click events
     modifier: Modifier = Modifier
 ) {
+    // Navbar
     NavigationBar {
+        // Home tab
         NavigationBarItem(
-            selected = PlantScreens.Home.title == currentDestination?.route,
+            selected = PlantScreens.Home.title == currentDestination?.route, // Mark as selected if current route matches Home route
             label = { Text(PlantScreens.Home.title) },
             icon = { Icon(Icons.Filled.Home, contentDescription = PlantScreens.Home.title) },
-            onClick = { onTabClick(PlantScreens.Home) }
+            onClick = { onTabClick(PlantScreens.Home) } // Handles event when tab is clicked (specified in PlantApp())
         )
+        // Quiz tab
         NavigationBarItem(
             selected = PlantScreens.Quiz.title == currentDestination?.route,
             label = { Text(PlantScreens.Quiz.title) },
             icon = { Icon(Icons.Filled.Info, contentDescription = PlantScreens.Quiz.title) },
             onClick = { onTabClick(PlantScreens.Quiz) }
         )
+        // Search tab
         NavigationBarItem(
             selected = PlantScreens.Search.title == currentDestination?.route,
             label = { Text(PlantScreens.Search.title) },
             icon = { Icon(Icons.Filled.Search, contentDescription = PlantScreens.Search.title) },
             onClick = { onTabClick(PlantScreens.Search) }
         )
+        // Journal tab
         NavigationBarItem(
             selected = PlantScreens.Journal.title == currentDestination?.route,
             label = { Text(PlantScreens.Journal.title) },
             icon = { Icon(Icons.Filled.DateRange, contentDescription = PlantScreens.Journal.title) },
             onClick = { onTabClick(PlantScreens.Journal) }
         )
+        // Profile tab
         NavigationBarItem(
             selected = PlantScreens.Profile.title == currentDestination?.route,
             label = { Text(PlantScreens.Profile.title) },

@@ -20,11 +20,12 @@ fun PlantApp(
     val currentDestination = navBackStackEntry?.destination
     val plantViewModel: PlantViewModel = viewModel()
     Scaffold(
+        // Bottom navigation bar
         bottomBar = {
             BottomNavigationBar(
                 currentDestination,
                 onTabClick = {
-                    navController.navigate(it.title)
+                    navController.navigate(it.title) // When tab in navbar is clicked, navigates to the page
                 },
                 modifier
             )
@@ -32,9 +33,13 @@ fun PlantApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = PlantScreens.Home.title,
+            startDestination = PlantScreens.Home.title, // Specifies starting destination
             modifier = Modifier.padding(innerPadding)
         ) {
+            /*
+            Specifies routes for when each page function should be called
+            e.g. If route is PlantScreens.home.title (= "Home"), then HomePage() is called
+            */
             composable(route = PlantScreens.Home.title) {
                 HomePage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
             }
