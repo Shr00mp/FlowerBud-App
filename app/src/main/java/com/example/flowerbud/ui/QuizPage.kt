@@ -137,11 +137,9 @@ fun QuizContent(
         ) {
             Row(modifier = modifier.align(alignment = Alignment.CenterHorizontally)) {
                 Text(
-                    text = "Plant Quiz",
-                    fontSize = 60.sp,
-                    fontFamily = customFont,
-                    modifier = Modifier.absolutePadding(0.dp, 50.dp, 0.dp, 15.dp),
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "PLANT QUIZ",
+                    fontSize = 40.sp,
+                    modifier = Modifier.absolutePadding(0.dp, 40.dp, 0.dp, 15.dp)
                 )
             }
 
@@ -149,7 +147,7 @@ fun QuizContent(
                 text = "Answer some questions about your plant preferences, and we'll find the best plant " +
                         "for you!",
                 fontSize = 20.sp,
-                modifier = Modifier.absolutePadding(30.dp, 25.dp, 30.dp, 40.dp)
+                modifier = Modifier.absolutePadding(30.dp, 20.dp, 30.dp, 40.dp)
             )
 
             // Price range section:
@@ -480,7 +478,7 @@ fun QuizContent(
                     .height(70.dp)
                     .width(300.dp)
             ) {
-                Text("Get Results", fontSize = 25.sp)
+                Text("GET RESULTS", fontSize = 25.sp)
             }
             Spacer(modifier = Modifier.height(80.dp))
         }
@@ -506,9 +504,11 @@ fun ResultsContent(
         ) {
             Spacer(modifier = Modifier.height(40.dp))
             Row(
-                modifier = Modifier.padding(20.dp, 0.dp)
+                modifier = Modifier
+                    .padding(20.dp, 0.dp)
+                    .align(alignment = Alignment.CenterHorizontally)
             ){
-                Text("Your top 5 results:", fontSize = 40.sp)
+                Text("YOUR TOP 5 RESULTS", fontSize = 40.sp)
             }
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -543,7 +543,7 @@ fun ResultsContent(
                     .height(70.dp)
                     .width(300.dp)
             ) {
-                Text("Retake Quiz", fontSize = 25.sp)
+                Text("RETAKE QUIZ", fontSize = 25.sp)
             }
             Spacer(modifier = Modifier.height(80.dp))
         }

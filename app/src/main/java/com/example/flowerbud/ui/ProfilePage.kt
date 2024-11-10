@@ -1,6 +1,7 @@
 package com.example.flowerbud.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -44,21 +47,30 @@ fun ProfilePage(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.width(40.dp))
-        // Profile image and "Welcome back" text
-        Image(
-            painter = painterResource(id = R.drawable.profile),
-            contentDescription = "Profile picture",
+
+        Card(
             modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .size(300.dp)
-        )
-        Spacer(modifier = Modifier.width(15.dp))
-        val username = "Sharon"
-        Text(
-            "Welcome back, $username.",
-            fontSize = 40.sp,
-            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-        )
+                .fillMaxWidth()
+                .height(430.dp)
+                .absolutePadding(50.dp, 50.dp, 50.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+        ) {
+            // Profile image and "Welcome back" text
+            Image(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = "Profile picture",
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .size(300.dp)
+            )
+            Spacer(modifier = Modifier.width(15.dp))
+            val username = "Sharon"
+            Text(
+                "Welcome back, $username.",
+                fontSize = 40.sp,
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            )
+        }
 
         // State to keep track of the selected tab index
         var selectedTabIndex by remember { mutableStateOf(0) }

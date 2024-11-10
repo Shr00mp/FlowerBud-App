@@ -1,6 +1,7 @@
 package com.example.flowerbud.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,6 +45,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
     val uiState by plantViewModel.uiState.collectAsState()
     val isFavourites = uiState.favourites.contains(id) // = true if plant is already in Favourites and vice versa
     val isMyPlants = uiState.myPlants.any { it.plantId == id } // = true if plant is already in MyPlants and vice versa
+    val greenColour = Color(0xFF49a078)
+    val greenTwoColour = Color(0xFF9cc5a1)
+    val brownColour = Color(0xFFdce1de)
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -61,6 +67,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(top = 500.dp) // Padding to start below the image
+
         ) {
             // Card that slightly overlaps the image
             Card(
@@ -68,7 +75,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                     .fillMaxWidth()
                     .offset(y = (-50).dp), // Negative offset to overlap the image
                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                shape = RoundedCornerShape(50.dp)
+                shape = RoundedCornerShape(50.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = brownColour
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -94,7 +104,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             },
                             modifier = Modifier
                                 .height(55.dp)
-                                .width(450.dp)
+                                .width(450.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = greenColour
+                            )
                         ) {
                             // Shows different text depending on if it's already in My Plants or not
                             Text(
@@ -120,7 +133,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                                 imageVector = if (isFavourites) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                                 contentDescription = "Heart Icon",
                                 modifier = Modifier.size(40.dp),
-                                tint = if (isFavourites) Color.Red else Color.Black
+                                tint = if (isFavourites) greenColour else Color.Black
                             )
                         }
                     }
@@ -128,14 +141,14 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                     Spacer(modifier = Modifier.height(30.dp))
 
                     // Description of plant
-                    Text(
-                        text = "Description",
-                        fontSize = 30.sp
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
+//                    Text(
+//                        text = "Description",
+//                        fontSize = 30.sp
+//                    )
+                    Spacer(modifier = Modifier.height(5.dp))
                     Text(
                         text = plant.description,
-                        fontSize = 15.sp
+                        fontSize = 18.sp
                     )
 
                     Spacer(modifier = Modifier.height(25.dp))
@@ -145,7 +158,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
@@ -174,7 +190,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
@@ -196,7 +215,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
@@ -216,16 +238,19 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
                                     painter = painterResource(R.drawable.caticon),
                                     contentDescription = "Water icon"
                                 )
-                                var toxicText = "Non-Toxic"
+                                var toxicText = "Pet-friendly"
                                 if (plant.toxic) {
-                                    toxicText = "Toxic"
+                                    toxicText = "Non pet-friendly"
                                 }
                                 Text(
                                     text = toxicText,
@@ -242,7 +267,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
@@ -266,7 +294,10 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             modifier = Modifier
                                 .height(55.dp).width(245.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = brownColour
+                            )
                         ) {
                             Row() {
                                 Image(
@@ -291,7 +322,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = plant.commonIssues,
-                        fontSize = 15.sp
+                        fontSize = 18.sp
                     )
                     Spacer(modifier = Modifier.height(30.dp))
 
@@ -303,7 +334,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = plant.issueSolutions,
-                        fontSize = 15.sp
+                        fontSize = 18.sp
                     )
                 }
             }
