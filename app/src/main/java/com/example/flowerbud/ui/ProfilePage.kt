@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,8 +40,8 @@ fun ProfilePage(
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier
 ) {
-    val lightGreen = Color(0xFFdce1de)
-    val darkGreen = Color(0xFF49A078)
+    val lightGreen = colorResource(id = R.color.lightGreen)
+    val darkGreen = colorResource(id = R.color.darkGreen)
 
     val uiState by plantViewModel.uiState.collectAsState()
     // favouritePlants stores all <Plant>s in Favourites

@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -128,10 +129,10 @@ fun QuizContent(
         // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
         val submitBtnRef = createRef()
 
-        val lightGreen = Color(0xFFDCE1DE)
-        val darkGreen = Color(0xFF49A078)
-        val darkBlue = Color(0xFF216869)
-        val grayColour = Color(0xFFcbc8c4)
+        val lightGreen = colorResource(id = R.color.lightGreen)
+        val darkGreen = colorResource(id = R.color.darkGreen)
+        val darkBlue = colorResource(id = R.color.darkBlue)
+        val grayColour = colorResource(id = R.color.lightGrey)
 
         Column(
             modifier = modifier

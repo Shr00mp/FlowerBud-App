@@ -1,7 +1,6 @@
 package com.example.flowerbud.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,9 +45,9 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
     val uiState by plantViewModel.uiState.collectAsState()
     val isFavourites = uiState.favourites.contains(id) // = true if plant is already in Favourites and vice versa
     val isMyPlants = uiState.myPlants.any { it.plantId == id } // = true if plant is already in MyPlants and vice versa
-    val greenColour = Color(0xFF49a078)
-    val greenTwoColour = Color(0xFF9cc5a1)
-    val brownColour = Color(0xFFdce1de)
+
+    val lightGreen = colorResource(id = R.color.lightGreen)
+    val darkGreen = colorResource(id = R.color.darkGreen)
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -77,7 +77,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                 shape = RoundedCornerShape(50.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = brownColour
+                    containerColor = lightGreen
                 )
             ) {
                 Column(
@@ -106,7 +106,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                                 .height(55.dp)
                                 .width(450.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = greenColour
+                                containerColor = darkGreen
                             )
                         ) {
                             // Shows different text depending on if it's already in My Plants or not
@@ -133,7 +133,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                                 imageVector = if (isFavourites) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                                 contentDescription = "Heart Icon",
                                 modifier = Modifier.size(40.dp),
-                                tint = if (isFavourites) greenColour else Color.Black
+                                tint = if (isFavourites) darkGreen else Color.Black
                             )
                         }
                     }
@@ -160,7 +160,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
@@ -192,7 +192,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
@@ -217,7 +217,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
@@ -240,7 +240,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
@@ -269,7 +269,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
@@ -296,7 +296,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = brownColour
+                                containerColor = lightGreen
                             )
                         ) {
                             Row() {
