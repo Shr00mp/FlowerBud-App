@@ -88,7 +88,7 @@ fun SearchBar(
 // Function to show plant cards for different plants
 @Composable
 fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavController) {
-    val brownColour = Color(0xFFdce1de)
+    val lightGreen = Color(0xFFdce1de)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,7 +100,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
             },
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
-            containerColor = brownColour
+            containerColor = lightGreen
         )
     ) {
         Row(modifier = Modifier.align(Alignment.Start)) {
@@ -133,7 +133,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = brownColour
+                            containerColor = lightGreen
                         )
                     ) {
                         Image(
@@ -149,7 +149,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = brownColour
+                            containerColor = lightGreen
                         )
                     ) {
                         Image(
@@ -166,7 +166,7 @@ fun PlantCard(modifier: Modifier = Modifier, plant: Plant, navController: NavCon
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = brownColour
+                            containerColor = lightGreen
                         )
                     ) {
                         Image(

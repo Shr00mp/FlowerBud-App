@@ -15,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SliderDefaults
@@ -126,8 +128,9 @@ fun QuizContent(
         // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
         val submitBtnRef = createRef()
 
-        val greenColour = Color(0xFF70805d)
-        val purpleColour = Color(0xFF96a7b6)
+        val lightGreen = Color(0xFFDCE1DE)
+        val darkGreen = Color(0xFF49A078)
+        val darkBlue = Color(0xFF216869)
         val grayColour = Color(0xFFcbc8c4)
 
         Column(
@@ -151,37 +154,52 @@ fun QuizContent(
             )
 
             // Price range section:
-            Text(
-                text = "What is your price range?",
-                modifier = Modifier.absolutePadding(30.dp, 20.dp, 0.dp, 0.dp),
-                fontSize = 25.sp,
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            var sliderPosition1 by remember { mutableStateOf(0f..50f) }
-            Column(
-                modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
-            ) {
-                // Price range slider
-                RangeSlider(
-                    value = sliderPosition1,
-                    steps = 4,
-                    onValueChange = { range ->
-                        run {
-                            sliderPosition1 = range;
-                            price_start = range.start.toInt() // price_start updates to user's min choice
-                            price_end = range.endInclusive.toInt() // price_end updates to user's max choice
-                        }
-                    },
-                    colors = SliderDefaults.colors(
-                        thumbColor = greenColour,
-                        activeTrackColor = greenColour,
-                    ),
-                    valueRange = 0f..50f,
-                    onValueChangeFinished = {},
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(165.dp)
+                    .padding(30.dp, 10.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = lightGreen
                 )
-                Text(text = "£" + price_start.toString() + " to " + "£" + price_end.toString())
+            ) {
+                Column() {
+                    Text(
+                        text = "What is your price range?",
+                        modifier = Modifier.absolutePadding(30.dp, 20.dp, 0.dp, 0.dp),
+                        fontSize = 25.sp,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    var sliderPosition1 by remember { mutableStateOf(0f..50f) }
+                    Column(
+                        modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
+                    ) {
+                        // Price range slider
+                        RangeSlider(
+                            value = sliderPosition1,
+                            steps = 4,
+                            onValueChange = { range ->
+                                run {
+                                    sliderPosition1 = range;
+                                    price_start = range.start.toInt() // price_start updates to user's min choice
+                                    price_end = range.endInclusive.toInt() // price_end updates to user's max choice
+                                }
+                            },
+                            colors = SliderDefaults.colors(
+                                thumbColor = darkGreen,
+                                activeTrackColor = darkGreen,
+                            ),
+                            valueRange = 0f..50f,
+                            onValueChangeFinished = {},
+                        )
+                        Text(text = "£" + price_start.toString() + " to " + "£" + price_end.toString())
+                    }
+                }
             }
+
+
 
             // Water frequency section:
             Text(
@@ -207,8 +225,8 @@ fun QuizContent(
                         }
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = greenColour,
-                        activeTrackColor = greenColour,
+                        thumbColor = darkGreen,
+                        activeTrackColor = darkGreen,
                     ),
                     valueRange = 1f..4f,
                     onValueChangeFinished = {},
@@ -244,8 +262,8 @@ fun QuizContent(
                         }
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = greenColour,
-                        activeTrackColor = greenColour,
+                        thumbColor = darkGreen,
+                        activeTrackColor = darkGreen,
                     ),
                     valueRange = 1f..5f,
                     onValueChangeFinished = {},
@@ -281,8 +299,8 @@ fun QuizContent(
                         }
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = greenColour,
-                        activeTrackColor = greenColour,
+                        thumbColor = darkGreen,
+                        activeTrackColor = darkGreen,
                     ),
                     valueRange = 1f..3f,
                     onValueChangeFinished = {},
@@ -321,7 +339,7 @@ fun QuizContent(
                     Button(
                         onClick = {
                             toxic_yn = true
-                            yesButtonColourT.value = greenColour
+                            yesButtonColourT.value = darkGreen
                             yesButtonTextColourT.value = Color.White
                             noButtonColourT.value = grayColour
                             noButtonTextColourT.value = Color.Gray
@@ -332,7 +350,7 @@ fun QuizContent(
                             .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
                             .width(200.dp),
                         border = BorderStroke(
-                            2.dp, if (yesButtonClickedT) greenColour else Color.Gray
+                            2.dp, if (yesButtonClickedT) darkGreen else Color.Gray
                         ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = yesButtonColourT.value,
@@ -347,7 +365,7 @@ fun QuizContent(
                             toxic_yn = false
                             yesButtonColourT.value = grayColour
                             yesButtonTextColourT.value = Color.Gray
-                            noButtonColourT.value = greenColour
+                            noButtonColourT.value = darkGreen
                             noButtonTextColourT.value = Color.White
                             yesButtonClickedT = false
                             noButtonClickedT = true
@@ -356,7 +374,7 @@ fun QuizContent(
                             .absolutePadding(15.dp, 20.dp, 30.dp, 0.dp)
                             .width(200.dp),
                         border = BorderStroke(
-                            2.dp, if (noButtonClickedT) greenColour else Color.Gray
+                            2.dp, if (noButtonClickedT) darkGreen else Color.Gray
                         ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = noButtonColourT.value,
@@ -399,7 +417,7 @@ fun QuizContent(
                     Button(
                         onClick = {
                             outdoor = false
-                            indoorButtonColour.value = greenColour
+                            indoorButtonColour.value = darkGreen
                             indoorButtonTextColour.value = Color.White
                             outdoorButtonColour.value = grayColour
                             outdoorButtonTextColour.value = Color.Gray
@@ -410,7 +428,7 @@ fun QuizContent(
                             .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
                             .width(200.dp),
                         border = BorderStroke(
-                            2.dp, if (indoorButtonClicked) greenColour else Color.Gray
+                            2.dp, if (indoorButtonClicked) darkGreen else Color.Gray
                         ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = indoorButtonColour.value,
@@ -425,7 +443,7 @@ fun QuizContent(
                             outdoor = true
                             indoorButtonColour.value = grayColour
                             indoorButtonTextColour.value = Color.Gray
-                            outdoorButtonColour.value = greenColour
+                            outdoorButtonColour.value = darkGreen
                             outdoorButtonTextColour.value = Color.White
                             indoorButtonClicked = false
                             outdoorButtonClicked = true
@@ -434,7 +452,7 @@ fun QuizContent(
                             .absolutePadding(15.dp, 20.dp, 30.dp, 0.dp)
                             .width(200.dp),
                         border = BorderStroke(
-                            2.dp, if (outdoorButtonClicked) greenColour else Color.Gray
+                            2.dp, if (outdoorButtonClicked) darkGreen else Color.Gray
                         ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = outdoorButtonColour.value,
@@ -471,7 +489,7 @@ fun QuizContent(
                     onContentChange("Results") // content = "Results" so display changes to ResultsContent()
                           },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purpleColour,
+                    containerColor = darkBlue,
                     contentColor = Color.White
                 ),
                 modifier = Modifier

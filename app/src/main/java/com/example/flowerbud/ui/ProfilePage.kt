@@ -1,7 +1,6 @@
 package com.example.flowerbud.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
@@ -16,6 +15,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +39,9 @@ fun ProfilePage(
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier
 ) {
+    val lightGreen = Color(0xFFdce1de)
+    val darkGreen = Color(0xFF49A078)
+
     val uiState by plantViewModel.uiState.collectAsState()
     // favouritePlants stores all <Plant>s in Favourites
     val favouritePlants: List<Plant> =
@@ -53,7 +58,10 @@ fun ProfilePage(
                 .fillMaxWidth()
                 .height(430.dp)
                 .absolutePadding(50.dp, 50.dp, 50.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = lightGreen
+            )
         ) {
             // Profile image and "Welcome back" text
             Image(
@@ -85,8 +93,13 @@ fun ProfilePage(
                 modifier = Modifier
                     .padding(50.dp, 30.dp)
                     .align(alignment = Alignment.CenterHorizontally),
-//            containerColor = MaterialTheme.colorScheme.primary,
-//            contentColor = MaterialTheme.colorScheme.onPrimary
+                contentColor = darkGreen,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = darkGreen, // Change the underline color
+                    )
+                }
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
