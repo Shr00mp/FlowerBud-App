@@ -118,13 +118,14 @@ fun idToPlant(id: String?) : Plant {
 // Class for data stored across different pages (i.e. ui state that can be accessed by entire app)
 data class PlantUiState(
     val favourites: List<String> = emptyList<String>(),
+//    val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now(), plantName = "Spider Plant", plantImage = R.drawable.spiderplant))
     val myPlants: List<UserPlant> = emptyList<UserPlant>()
 )
 // Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
     val plantId: String,
     val waterWeek: Int,
-    var lastWatered: LocalDate?,
+    var lastWateredDates: List<LocalDate>,
     var nextWaterDay: LocalDate,
     val plantName: String,
     val plantImage: Int,
@@ -156,7 +157,7 @@ class PlantViewModel: ViewModel() {
     // Add to My plants list
     fun addToMyPlants(plant: Plant) {
         if (!_uiState.value.myPlants.any {it.plantId == plant.plantId}) {
-            val updatedMyPlants = _uiState.value.myPlants + UserPlant(plant.plantId, plant.waterWeek, null, LocalDate.now(), plant.name, plant.image)
+            val updatedMyPlants = _uiState.value.myPlants + UserPlant(plant.plantId, plant.waterWeek, emptyList(), LocalDate.now(), plant.name, plant.image)
             _uiState.update { currentState -> currentState.copy(myPlants = updatedMyPlants) }
         }
     }
@@ -169,10 +170,12 @@ class PlantViewModel: ViewModel() {
 
     // Water the plant
     fun waterPlant(plantId: String) {
-        val currentPlant = _uiState.value.myPlants.filter{ it.plantId == plantId }
-        if (currentPlant.isNotEmpty()) {
-            currentPlant[0].lastWatered = LocalDate.now()
-            currentPlant[0].nextWaterDay = LocalDate.now().plusWeeks(currentPlant[0].waterWeek.toLong())
+
+        val mappedPlant = _uiState.value.myPlants.map {
+            if (it.plantId == plantId)
+                UserPlant(it.plantId, it.waterWeek, it.lastWateredDates + LocalDate.now(), LocalDate.now().plusWeeks(it.waterWeek.toLong()), it.plantName, it.plantImage)
+            else it
         }
+        _uiState.update { currentState -> currentState.copy(myPlants = mappedPlant) }
     }
 }
