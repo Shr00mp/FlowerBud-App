@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.LocalDate
 
 data class Plant(
     val name: String,
@@ -121,7 +122,12 @@ data class PlantUiState(
 )
 // Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
-    val plantId: String
+    val plantId: String,
+    val waterWeek: Int,
+    var lastWatered: LocalDate?,
+    var nextWaterDay: LocalDate,
+    val plantName: String,
+    val plantImage: Int,
 )
 
 /*
@@ -148,9 +154,9 @@ class PlantViewModel: ViewModel() {
     }
 
     // Add to My plants list
-    fun addToMyPlants(plantId: String) {
-        if (!_uiState.value.myPlants.any {it.plantId == plantId}) {
-            val updatedMyPlants = _uiState.value.myPlants + UserPlant(plantId)
+    fun addToMyPlants(plant: Plant) {
+        if (!_uiState.value.myPlants.any {it.plantId == plant.plantId}) {
+            val updatedMyPlants = _uiState.value.myPlants + UserPlant(plant.plantId, plant.waterWeek, null, LocalDate.now(), plant.name, plant.image)
             _uiState.update { currentState -> currentState.copy(myPlants = updatedMyPlants) }
         }
     }
@@ -159,5 +165,14 @@ class PlantViewModel: ViewModel() {
     fun removeFromMyPlants(plantId: String) {
         val updatedMyPlants = _uiState.value.myPlants.filter{ it.plantId != plantId }
         _uiState.update { currentState -> currentState.copy(myPlants = updatedMyPlants) }
+    }
+
+    // Water the plant
+    fun waterPlant(plantId: String) {
+        val currentPlant = _uiState.value.myPlants.filter{ it.plantId == plantId }
+        if (currentPlant.isNotEmpty()) {
+            currentPlant[0].lastWatered = LocalDate.now()
+            currentPlant[0].nextWaterDay = LocalDate.now().plusWeeks(currentPlant[0].waterWeek.toLong())
+        }
     }
 }

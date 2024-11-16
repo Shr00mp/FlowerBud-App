@@ -41,7 +41,7 @@ fun ProfilePage(
     modifier: Modifier = Modifier
 ) {
     val lightGreen = colorResource(id = R.color.lightGreen)
-    val darkGreen = colorResource(id = R.color.darkGreen)
+    val darkBlue = colorResource(id = R.color.darkBlue)
 
     val uiState by plantViewModel.uiState.collectAsState()
     // favouritePlants stores all <Plant>s in Favourites
@@ -94,11 +94,11 @@ fun ProfilePage(
                 modifier = Modifier
                     .padding(50.dp, 30.dp)
                     .align(alignment = Alignment.CenterHorizontally),
-                contentColor = darkGreen,
+                contentColor = darkBlue,
                 indicator = { tabPositions ->
                     TabRowDefaults.Indicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                        color = darkGreen, // Change the underline color
+                        color = darkBlue, // Change the underline color
                     )
                 }
             ) {

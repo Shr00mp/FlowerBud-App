@@ -96,7 +96,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                             // Adds to / Removes from My Plants depending on if already in My Plants
                             onClick = {
                                 if (!isMyPlants) {
-                                    plantViewModel.addToMyPlants(plant.plantId)
+                                    plantViewModel.addToMyPlants(plant)
                                 }
                                 else {
                                     plantViewModel.removeFromMyPlants(plant.plantId)
