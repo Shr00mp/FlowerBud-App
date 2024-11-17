@@ -44,8 +44,8 @@ fun getPlants(
     waterStart: Int, waterEnd: Int,
     spaceStart: Int, spaceEnd: Int,
     lightStart: Int, lightEnd: Int,
-    toxic_yn: Boolean,
-    outdoor: Boolean
+    toxic_yn: Boolean?,
+    outdoor: Boolean?
 ): MutableList<Plant> {
     val allScores = MutableList(11) { 0 }
     // Calculates a score for each plant based on how many of the user's preference criteria it fits
@@ -110,17 +110,6 @@ fun QuizContent(
     modifier: Modifier = Modifier,
 ) {
     val uiState by plantViewModel.uiState.collectAsState()
-    // Variables to store user choices
-    var priceStart by remember { mutableStateOf(uiState.quizChoices?.priceStart ?: 0)}
-    var priceEnd by remember { mutableStateOf(uiState.quizChoices?.priceEnd ?: 50) }
-    var water_start by remember { mutableStateOf(uiState.quizChoices?.waterStart ?: 1) }
-    var water_end by remember { mutableStateOf(uiState.quizChoices?.waterEnd ?: 4) }
-    var space_start by remember { mutableStateOf(uiState.quizChoices?.spaceStart ?: 1) }
-    var space_end by remember { mutableStateOf(uiState.quizChoices?.spaceEnd ?: 5) }
-    var light_start by remember { mutableStateOf(uiState.quizChoices?.lightStart ?: 1) }
-    var light_end by remember { mutableStateOf(uiState.quizChoices?.lightEnd ?: 3) }
-    var toxic_yn by remember { mutableStateOf(uiState.quizChoices?.toxicYn ?: false) }
-    var outdoor by remember { mutableStateOf(uiState.quizChoices?.outdoor ?: false) }
 
     ConstraintLayout {
         // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
@@ -143,7 +132,6 @@ fun QuizContent(
                     fontSize = 40.sp,
                     modifier = Modifier.absolutePadding(0.dp, 40.dp, 0.dp, 15.dp)
                 )
-//                Text(text = uiState.quizChoices?.priceStart?.toString() ?: "No value")
             }
 
             Text(
@@ -172,19 +160,17 @@ fun QuizContent(
                         style = MaterialTheme.typography.headlineSmall
                     )
 
-                    var sliderPosition1 by remember { mutableStateOf(0f..50f) }
                     Column(
                         modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
                     ) {
                         // Price range slider
                         RangeSlider(
-                            value = sliderPosition1,
+                            value = uiState.quizChoices.priceStart.toFloat()..uiState.quizChoices.priceEnd.toFloat(),
                             steps = 4,
                             onValueChange = { range ->
                                 run {
-                                    sliderPosition1 = range;
-                                    priceStart = range.start.toInt() // price_start updates to user's min choice
-                                    priceEnd = range.endInclusive.toInt() // price_end updates to user's max choice
+                                    plantViewModel.updatePriceStart(range.start.toInt()) // price_start updates to user's min choice
+                                    plantViewModel.updatePriceEnd(range.endInclusive.toInt()) // price_end updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -194,7 +180,7 @@ fun QuizContent(
                             valueRange = 0f..50f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = "£" + priceStart.toString() + " to " + "£" + priceEnd.toString())
+                        Text(text = "£" + uiState.quizChoices.priceStart.toString() + " to " + "£" + uiState.quizChoices.priceStart.toString())
                     }
                 }
             }
@@ -220,19 +206,17 @@ fun QuizContent(
                         style = MaterialTheme.typography.headlineSmall
                     )
 
-                    var sliderPosition2 by remember { mutableStateOf(1f..4f) }
                     Column(
                         modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
                     ) {
                         // Water frequency slider
                         RangeSlider(
-                            value = sliderPosition2,
+                            value = uiState.quizChoices.waterStart.toFloat()..uiState.quizChoices.waterEnd.toFloat(),
                             steps = 2,
                             onValueChange = { range ->
                                 run {
-                                    sliderPosition2 = range;
-                                    water_start = range.start.toInt() // water_start updates to user's min choice
-                                    water_end = range.endInclusive.toInt() // water_end updates to user's max choice
+                                    plantViewModel.updateWaterStart(range.start.toInt()) // water_start updates to user's min choice
+                                    plantViewModel.updateWaterEnd(range.endInclusive.toInt()) // water_end updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -242,7 +226,7 @@ fun QuizContent(
                             valueRange = 1f..4f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = "Every " + water_start.toString() + " to " + water_end.toString() + " weeks")
+                        Text(text = "Every " + uiState.quizChoices.waterStart.toString() + " to " + uiState.quizChoices.waterEnd.toString() + " weeks")
                     }
                 }
             }
@@ -271,19 +255,17 @@ fun QuizContent(
                         modifier = Modifier.absolutePadding(30.dp, 5.dp)
                     )
 
-                    var sliderPosition3 by remember { mutableStateOf(1f..5f) }
                     Column(
                         modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
                     ) {
                         // Space availability slider
                         RangeSlider(
-                            value = sliderPosition3,
+                            value = uiState.quizChoices.spaceStart.toFloat()..uiState.quizChoices.spaceEnd.toFloat(),
                             steps = 3,
                             onValueChange = { range ->
                                 run {
-                                    sliderPosition3 = range;
-                                    space_start = range.start.toInt() // space_start updates to user's min choice
-                                    space_end = range.endInclusive.toInt() // space_end updates to user's max choice
+                                    plantViewModel.updateSpaceStart(range.start.toInt()) // space_start updates to user's min choice
+                                    plantViewModel.updateSpaceEnd(range.endInclusive.toInt()) // space_end updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -293,7 +275,7 @@ fun QuizContent(
                             valueRange = 1f..5f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = space_start.toString() + " to " + space_end.toString())
+                        Text(text = uiState.quizChoices.spaceStart.toString() + " to " + uiState.quizChoices.spaceEnd.toString())
                     }
                 }
             }
@@ -322,19 +304,17 @@ fun QuizContent(
                         modifier = Modifier.absolutePadding(30.dp, 5.dp)
                     )
 
-                    var sliderPosition4 by remember { mutableStateOf(1f..3f) }
                     Column(
                         modifier = Modifier.absolutePadding(30.dp, 0.dp, 30.dp, 0.dp)
                     ) {
                         // Light availability slider
                         RangeSlider(
-                            value = sliderPosition4,
+                            value = uiState.quizChoices.lightStart.toFloat()..uiState.quizChoices.lightEnd.toFloat(),
                             steps = 1,
                             onValueChange = { range ->
                                 run {
-                                    sliderPosition4 = range;
-                                    light_start = range.start.toInt() // light_start variable updates to user's min choice
-                                    light_end = range.endInclusive.toInt() // light_end variable updates to user's max choice
+                                    plantViewModel.updateLightStart(range.start.toInt()) // light_start variable updates to user's min choice
+                                    plantViewModel.updateLightEnd(range.endInclusive.toInt()) // light_end variable updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -344,7 +324,7 @@ fun QuizContent(
                             valueRange = 1f..3f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = light_start.toString() + " to " + light_end.toString())
+                        Text(text = uiState.quizChoices.lightStart.toString() + " to " + uiState.quizChoices.lightEnd.toString())
                     }
                 }
             }
@@ -369,12 +349,6 @@ fun QuizContent(
                         style = MaterialTheme.typography.headlineSmall
                     )
 
-                    val yesButtonColourT = remember { mutableStateOf(grayColour) }
-                    val yesButtonTextColourT = remember { mutableStateOf(Color.Gray) }
-                    val noButtonColourT = remember { mutableStateOf(grayColour) }
-                    val noButtonTextColourT = remember { mutableStateOf(Color.Gray) }
-                    var yesButtonClickedT by remember { mutableStateOf(false) }
-                    var noButtonClickedT by remember { mutableStateOf(false) }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -391,23 +365,17 @@ fun QuizContent(
                             // Yes (for if there are pets) button
                             Button(
                                 onClick = {
-                                    toxic_yn = true
-                                    yesButtonColourT.value = darkGreen
-                                    yesButtonTextColourT.value = Color.White
-                                    noButtonColourT.value = grayColour
-                                    noButtonTextColourT.value = Color.Gray
-                                    yesButtonClickedT = true
-                                    noButtonClickedT = false
+                                    plantViewModel.updateToxicYn(true)
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
                                     .width(200.dp),
                                 border = BorderStroke(
-                                    2.dp, if (yesButtonClickedT) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.toxicYn == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = yesButtonColourT.value,
-                                    contentColor = yesButtonTextColourT.value
+                                    containerColor = if(uiState.quizChoices.toxicYn == true) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.toxicYn == true) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("Yes", fontSize = 25.sp)
@@ -415,23 +383,17 @@ fun QuizContent(
                             // No (for if there are pets) button
                             Button(
                                 onClick = {
-                                    toxic_yn = false
-                                    yesButtonColourT.value = grayColour
-                                    yesButtonTextColourT.value = Color.Gray
-                                    noButtonColourT.value = darkGreen
-                                    noButtonTextColourT.value = Color.White
-                                    yesButtonClickedT = false
-                                    noButtonClickedT = true
+                                    plantViewModel.updateToxicYn(false)
                                 },
                                 modifier = Modifier
                                     .absolutePadding(15.dp, 20.dp, 30.dp, 0.dp)
                                     .width(200.dp),
                                 border = BorderStroke(
-                                    2.dp, if (noButtonClickedT) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.toxicYn == false) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = noButtonColourT.value,
-                                    contentColor = noButtonTextColourT.value
+                                    containerColor = if(uiState.quizChoices.toxicYn == false) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.toxicYn == false) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("No", fontSize = 25.sp)
@@ -461,12 +423,6 @@ fun QuizContent(
                         style = MaterialTheme.typography.headlineSmall
                     )
 
-                    val indoorButtonColour = remember { mutableStateOf(grayColour) }
-                    val indoorButtonTextColour = remember { mutableStateOf(Color.Gray) }
-                    val outdoorButtonColour = remember { mutableStateOf(grayColour) }
-                    val outdoorButtonTextColour = remember { mutableStateOf(Color.Gray) }
-                    var indoorButtonClicked by remember { mutableStateOf(false) }
-                    var outdoorButtonClicked by remember { mutableStateOf(false) }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -483,23 +439,17 @@ fun QuizContent(
                             // Indoor button
                             Button(
                                 onClick = {
-                                    outdoor = false
-                                    indoorButtonColour.value = darkGreen
-                                    indoorButtonTextColour.value = Color.White
-                                    outdoorButtonColour.value = grayColour
-                                    outdoorButtonTextColour.value = Color.Gray
-                                    indoorButtonClicked = true
-                                    outdoorButtonClicked = false
+                                    plantViewModel.updateOutdoor(false)
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
                                     .width(200.dp),
                                 border = BorderStroke(
-                                    2.dp, if (indoorButtonClicked) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.outdoor == false) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = indoorButtonColour.value,
-                                    contentColor = indoorButtonTextColour.value
+                                    containerColor = if(uiState.quizChoices.outdoor == false) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.outdoor == false) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("Indoor", fontSize = 25.sp)
@@ -507,23 +457,17 @@ fun QuizContent(
                             // Outdoor button
                             Button(
                                 onClick = {
-                                    outdoor = true
-                                    indoorButtonColour.value = grayColour
-                                    indoorButtonTextColour.value = Color.Gray
-                                    outdoorButtonColour.value = darkGreen
-                                    outdoorButtonTextColour.value = Color.White
-                                    indoorButtonClicked = false
-                                    outdoorButtonClicked = true
+                                    plantViewModel.updateOutdoor(true)
                                 },
                                 modifier = Modifier
                                     .absolutePadding(15.dp, 20.dp, 30.dp, 0.dp)
                                     .width(200.dp),
                                 border = BorderStroke(
-                                    2.dp, if (outdoorButtonClicked) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.outdoor == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = outdoorButtonColour.value,
-                                    contentColor = outdoorButtonTextColour.value
+                                    containerColor = if(uiState.quizChoices.outdoor == true) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.outdoor == true) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("Outdoor", fontSize = 25.sp)
@@ -550,21 +494,14 @@ fun QuizContent(
             Button(
                 onClick = {
                     top5Plants.clear()
-                    val top5Results = getPlants(priceStart, priceEnd,
-                    water_start, water_end,
-                    space_start, space_end,
-                    light_start, light_end,
-                    toxic_yn, outdoor)
-                    plantViewModel.saveQuizChoices(
-                        priceStart, priceEnd,
-                        water_start, water_end,
-                        space_start, space_end,
-                        light_start, light_end,
-                        toxic_yn, outdoor
-                    )
+                    val top5Results = getPlants(uiState.quizChoices.priceStart, uiState.quizChoices.priceEnd,
+                        uiState.quizChoices.waterStart, uiState.quizChoices.waterEnd,
+                        uiState.quizChoices.spaceStart, uiState.quizChoices.spaceEnd,
+                        uiState.quizChoices.lightStart, uiState.quizChoices.lightEnd,
+                        uiState.quizChoices.toxicYn, uiState.quizChoices.outdoor)
                     top5Plants.addAll(top5Results)
                     onContentChange("Results")// content = "Results" so display changes to ResultsContent()
-                          },
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = darkBlue,
                     contentColor = Color.White
