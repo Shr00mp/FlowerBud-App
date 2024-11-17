@@ -22,24 +22,30 @@ fun PlantApp(
     Scaffold(
         // Bottom navigation bar
         bottomBar = {
-            BottomNavigationBar(
-                currentDestination,
-                onTabClick = {
-                    navController.navigate(it.title) // When tab in navbar is clicked, navigates to the page
-                },
-                modifier
-            )
+            if (currentDestination?.route != PlantScreens.Login.title) {
+                BottomNavigationBar(
+                    currentDestination,
+                    onTabClick = {
+                        navController.navigate(it.title) // When tab in navbar is clicked, navigates to the page
+                    },
+                    modifier
+                )
+            }
+
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = PlantScreens.Home.title, // Specifies starting destination
+            startDestination = PlantScreens.Login.title, // Specifies starting destination
             modifier = Modifier.padding(innerPadding)
         ) {
             /*
             Specifies routes for when each page function should be called
             e.g. If route is PlantScreens.home.title (= "Home"), then HomePage() is called
             */
+            composable(route = PlantScreens.Login.title) {
+                LoginPage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
+            }
             composable(route = PlantScreens.Home.title) {
                 HomePage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
             }

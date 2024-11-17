@@ -20,9 +20,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -42,8 +45,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.flowerbud.R
+import kotlinx.coroutines.NonDisposableHandle.parent
 import kotlinx.coroutines.selects.select
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -69,35 +74,80 @@ fun HomePage(
 
     val calendarUiModel = dataSource.getData(lastSelectedDate = selectedDate)
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Spacer(modifier = Modifier.height(25.dp))
-        Header(
-            data = calendarUiModel,
-        )
-        Content(data = calendarUiModel,
-            onDateClick = { newDate ->
-                selectedDate = newDate
-                onDayChange(selectedDate, myPlants, plantsToWater)
-            },
-            onPreviousClick = {
-                selectedDate = selectedDate.minusWeeks(1)
-                onDayChange(selectedDate, myPlants, plantsToWater)
-            },
-            onNextClick = {
-                selectedDate = selectedDate.plusWeeks(1)
-                onDayChange(selectedDate, myPlants, plantsToWater)
-            })
-        if (plantsToWater.isNotEmpty()) {
-            WaterTasks(plantsToWater = plantsToWater, plantViewModel = plantViewModel, selectedDate = selectedDate)
+    ConstraintLayout {
+        val searchPageRef = createRef()
+        val darkBlue = colorResource(id = R.color.darkBlue)
+
+        Column(modifier = modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(25.dp))
+            Header(
+                data = calendarUiModel,
+            )
+            Content(data = calendarUiModel,
+                onDateClick = { newDate ->
+                    selectedDate = newDate
+                    onDayChange(selectedDate, myPlants, plantsToWater)
+                },
+                onPreviousClick = {
+                    selectedDate = selectedDate.minusWeeks(1)
+                    onDayChange(selectedDate, myPlants, plantsToWater)
+                },
+                onNextClick = {
+                    selectedDate = selectedDate.plusWeeks(1)
+                    onDayChange(selectedDate, myPlants, plantsToWater)
+                })
+            if (plantsToWater.isNotEmpty()) {
+                WaterTasks(
+                    plantsToWater = plantsToWater,
+                    plantViewModel = plantViewModel,
+                    selectedDate = selectedDate
+                )
+            } else {
+                NoWaterTasks()
+            }
         }
-        else {
-            NoWaterTasks()
+        // Row to contain floating Get Results button
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .constrainAs(searchPageRef) {
+                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                }
+        ) {
+            // Get Results button
+            Button(
+                onClick = {
+                    navController.navigate(route = PlantScreens.Search.title)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = darkBlue,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .height(60.dp)
+                    .width(350.dp)
+            ) {
+                Text("Add more plants", fontSize = 25.sp)
+//                Icon(
+//                    imageVector = Icons.Filled.Add,
+//                    contentDescription = "Add Icon",
+//                    tint = Color.White,
+//                    modifier = Modifier.size(30.dp)
+//                )
+            }
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
 @Composable
-fun WaterTasks(plantsToWater: MutableList<UserPlant>, plantViewModel: PlantViewModel, selectedDate: LocalDate) {
+fun WaterTasks(
+    plantsToWater: MutableList<UserPlant>,
+    plantViewModel: PlantViewModel,
+    selectedDate: LocalDate
+) {
     val lightGreen = colorResource(id = R.color.lightGreen)
     Column {
         Spacer(modifier = Modifier.height(35.dp))
@@ -105,7 +155,8 @@ fun WaterTasks(plantsToWater: MutableList<UserPlant>, plantViewModel: PlantViewM
             Text(
                 text = "Watering",
                 fontSize = 40.sp,
-                modifier = Modifier.absolutePadding(35.dp))
+                modifier = Modifier.absolutePadding(35.dp)
+            )
             Spacer(modifier = Modifier.width(10.dp))
             Card(
                 modifier = Modifier
@@ -113,11 +164,17 @@ fun WaterTasks(plantsToWater: MutableList<UserPlant>, plantViewModel: PlantViewM
                     .absolutePadding(5.dp, 13.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = lightGreen )
+                    containerColor = lightGreen
+                )
             ) {
                 Text(
-                    text = if (plantsToWater.size > 1) {plantsToWater.size.toString() + " tasks"} else {plantsToWater.size.toString() + " task"},
-                    modifier = Modifier.align(Alignment.CenterHorizontally))
+                    text = if (plantsToWater.size > 1) {
+                        plantsToWater.size.toString() + " tasks"
+                    } else {
+                        plantsToWater.size.toString() + " task"
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
         }
 //        Spacer(modifier = Modifier.height(10.dp))
@@ -162,13 +219,15 @@ fun onDayChange(
     var filteredPlants = emptyList<UserPlant>()
     if (selectedDate == LocalDate.now()) {
         filteredPlants =
-            myPlants.filter { plant -> plant.nextWaterDay.isBefore(selectedDate) || plant.nextWaterDay == selectedDate || plant.lastWateredDates.contains(selectedDate)}
-    }
-    else if (selectedDate.isAfter(LocalDate.now())) {
+            myPlants.filter { plant ->
+                plant.nextWaterDay.isBefore(selectedDate) || plant.nextWaterDay == selectedDate || plant.lastWateredDates.contains(
+                    selectedDate
+                )
+            }
+    } else if (selectedDate.isAfter(LocalDate.now())) {
         filteredPlants =
             myPlants.filter { plant -> plant.nextWaterDay == selectedDate }
-    }
-    else if (selectedDate.isBefore(LocalDate.now())) {
+    } else if (selectedDate.isBefore(LocalDate.now())) {
         filteredPlants =
             myPlants.filter { plant -> plant.lastWateredDates.contains(selectedDate) }
     }
@@ -209,7 +268,7 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                 contentDescription = plant.plantName,
             )
             Spacer(modifier = Modifier.width(20.dp))
-            Column (
+            Column(
                 modifier = Modifier.width(250.dp)
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -222,14 +281,20 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                     modifier = Modifier.widthIn(max = 220.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isOverdue(selectedDate, plant)) {middleGreen} else lightGreen
+                        containerColor = if (isOverdue(selectedDate, plant)) {
+                            middleGreen
+                        } else lightGreen
                     )
                 ) {
                     Text(
                         text = if (!isOverdue(selectedDate, plant)) {
                             "Due date: Today"
                         } else {
-                            "Due date: " + plant.nextWaterDay.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+                            "Due date: " + plant.nextWaterDay.format(
+                                DateTimeFormatter.ofLocalizedDate(
+                                    FormatStyle.FULL
+                                )
+                            )
                         },
                         modifier = Modifier.padding(10.dp, 10.dp),
                         fontSize = 17.sp
@@ -242,19 +307,28 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                     .size(60.dp)
                     .clip(CircleShape)
                     .background(
-                        color = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(selectedDate)) {
+                        color = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(
+                                selectedDate
+                            )
+                        ) {
                             lightGrey
                         } else {
                             darkGreen
                         },
                     )
                     .align(Alignment.CenterVertically),
-                enabled = if (selectedDate == LocalDate.now() && !plant.lastWateredDates.contains(selectedDate)) true else false
+                enabled = if (selectedDate == LocalDate.now() && !plant.lastWateredDates.contains(
+                        selectedDate
+                    )
+                ) true else false
             ) {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = "Check Icon",
-                    tint = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(selectedDate)) {
+                    tint = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(
+                            selectedDate
+                        )
+                    ) {
                         darkGreen
                     } else {
                         lightGrey
@@ -304,8 +378,10 @@ fun Content(
             onClick = onPreviousClick,
             modifier = Modifier
                 .size(40.dp)
-                .absolutePadding(0.dp, 15.dp, 10.dp)) {
-            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back",
+                .absolutePadding(0.dp, 15.dp, 10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack, contentDescription = "Back",
 //                tint = darkBlue
             )
         }
@@ -316,8 +392,10 @@ fun Content(
             onClick = onNextClick,
             modifier = Modifier
                 .size(40.dp)
-                .absolutePadding(10.dp, 15.dp)) {
-            Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "Next",
+                .absolutePadding(10.dp, 15.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowForward, contentDescription = "Next",
 //                tint = darkBlue
             )
         }

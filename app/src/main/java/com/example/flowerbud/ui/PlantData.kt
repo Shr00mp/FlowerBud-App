@@ -1,5 +1,9 @@
 package com.example.flowerbud.ui
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.flowerbud.R
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -103,6 +107,7 @@ enum class PlantScreens(var title: String) {
     Search(title = "Search"),
     Journal(title= "Journal"),
     Profile(title = "Profile"),
+    Login(title = "Login"),
     PlantDetails(title = "Plant Details")
 }
 
@@ -119,7 +124,8 @@ fun idToPlant(id: String?) : Plant {
 data class PlantUiState(
     val favourites: List<String> = emptyList<String>(),
 //    val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now(), plantName = "Spider Plant", plantImage = R.drawable.spiderplant))
-    val myPlants: List<UserPlant> = emptyList<UserPlant>()
+    val myPlants: List<UserPlant> = emptyList<UserPlant>(),
+    val quizChoices: QuizChoices? = null
 )
 // Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
@@ -129,6 +135,19 @@ data class UserPlant (
     var nextWaterDay: LocalDate,
     val plantName: String,
     val plantImage: Int,
+)
+
+data class QuizChoices (
+    var priceStart: Int,
+    var priceEnd: Int,
+    var waterStart: Int,
+    var waterEnd: Int,
+    var spaceStart: Int,
+    var spaceEnd: Int,
+    var lightStart: Int,
+    var lightEnd: Int,
+    var toxicYn: Boolean,
+    var outdoor: Boolean,
 )
 
 /*
@@ -177,5 +196,32 @@ class PlantViewModel: ViewModel() {
             else it
         }
         _uiState.update { currentState -> currentState.copy(myPlants = mappedPlant) }
+    }
+
+    fun saveQuizChoices(
+        priceStart: Int,
+        priceEnd: Int,
+        waterStart: Int,
+        waterEnd: Int,
+        spaceStart: Int,
+        spaceEnd: Int,
+        lightStart: Int,
+        lightEnd: Int,
+        toxicYn: Boolean,
+        outdoor: Boolean,
+    ) {
+        val newChoices = QuizChoices(
+            priceStart = priceStart,
+            priceEnd = priceEnd,
+            waterStart = waterStart,
+            waterEnd = waterEnd,
+            spaceStart = spaceStart,
+            spaceEnd = spaceEnd,
+            lightStart = lightStart,
+            lightEnd = lightEnd,
+            toxicYn = toxicYn,
+            outdoor = outdoor,
+        )
+        _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
     }
 }

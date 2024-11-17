@@ -22,6 +22,7 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -110,20 +109,18 @@ fun QuizContent(
     onContentChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val customFont = FontFamily(
-        Font(R.font.plus_font)
-    )
+    val uiState by plantViewModel.uiState.collectAsState()
     // Variables to store user choices
-    var price_start by remember { mutableStateOf(0) }
-    var price_end by remember { mutableStateOf(50) }
-    var water_start by remember { mutableStateOf(1) }
-    var water_end by remember { mutableStateOf(4) }
-    var space_start by remember { mutableStateOf(1) }
-    var space_end by remember { mutableStateOf(5) }
-    var light_start by remember { mutableStateOf(1) }
-    var light_end by remember { mutableStateOf(3) }
-    var toxic_yn by remember { mutableStateOf(false) }
-    var outdoor by remember { mutableStateOf(false) }
+    var priceStart by remember { mutableStateOf(uiState.quizChoices?.priceStart ?: 0)}
+    var priceEnd by remember { mutableStateOf(uiState.quizChoices?.priceEnd ?: 50) }
+    var water_start by remember { mutableStateOf(uiState.quizChoices?.waterStart ?: 1) }
+    var water_end by remember { mutableStateOf(uiState.quizChoices?.waterEnd ?: 4) }
+    var space_start by remember { mutableStateOf(uiState.quizChoices?.spaceStart ?: 1) }
+    var space_end by remember { mutableStateOf(uiState.quizChoices?.spaceEnd ?: 5) }
+    var light_start by remember { mutableStateOf(uiState.quizChoices?.lightStart ?: 1) }
+    var light_end by remember { mutableStateOf(uiState.quizChoices?.lightEnd ?: 3) }
+    var toxic_yn by remember { mutableStateOf(uiState.quizChoices?.toxicYn ?: false) }
+    var outdoor by remember { mutableStateOf(uiState.quizChoices?.outdoor ?: false) }
 
     ConstraintLayout {
         // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
@@ -133,6 +130,7 @@ fun QuizContent(
         val darkGreen = colorResource(id = R.color.darkGreen)
         val darkBlue = colorResource(id = R.color.darkBlue)
         val grayColour = colorResource(id = R.color.lightGrey)
+
 
         Column(
             modifier = modifier
@@ -145,6 +143,7 @@ fun QuizContent(
                     fontSize = 40.sp,
                     modifier = Modifier.absolutePadding(0.dp, 40.dp, 0.dp, 15.dp)
                 )
+//                Text(text = uiState.quizChoices?.priceStart?.toString() ?: "No value")
             }
 
             Text(
@@ -184,8 +183,8 @@ fun QuizContent(
                             onValueChange = { range ->
                                 run {
                                     sliderPosition1 = range;
-                                    price_start = range.start.toInt() // price_start updates to user's min choice
-                                    price_end = range.endInclusive.toInt() // price_end updates to user's max choice
+                                    priceStart = range.start.toInt() // price_start updates to user's min choice
+                                    priceEnd = range.endInclusive.toInt() // price_end updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -195,7 +194,7 @@ fun QuizContent(
                             valueRange = 0f..50f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = "£" + price_start.toString() + " to " + "£" + price_end.toString())
+                        Text(text = "£" + priceStart.toString() + " to " + "£" + priceEnd.toString())
                     }
                 }
             }
@@ -551,13 +550,20 @@ fun QuizContent(
             Button(
                 onClick = {
                     top5Plants.clear()
-                    val top5Results = getPlants(price_start, price_end,
+                    val top5Results = getPlants(priceStart, priceEnd,
                     water_start, water_end,
                     space_start, space_end,
                     light_start, light_end,
                     toxic_yn, outdoor)
+                    plantViewModel.saveQuizChoices(
+                        priceStart, priceEnd,
+                        water_start, water_end,
+                        space_start, space_end,
+                        light_start, light_end,
+                        toxic_yn, outdoor
+                    )
                     top5Plants.addAll(top5Results)
-                    onContentChange("Results") // content = "Results" so display changes to ResultsContent()
+                    onContentChange("Results")// content = "Results" so display changes to ResultsContent()
                           },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = darkBlue,
