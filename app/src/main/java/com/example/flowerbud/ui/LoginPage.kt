@@ -114,8 +114,8 @@ fun LoginPage(
 
         // Content for each tab, specified using the Tab Index
         when (selectedTab) {
-            0 -> LoginContent(navController = navController)
-            1 -> SignupContent(navController = navController)
+            0 -> LoginContent(navController = navController, plantViewModel = plantViewModel)
+            1 -> SignupContent(navController = navController, plantViewModel = plantViewModel)
         }
     }
 
@@ -124,7 +124,7 @@ fun LoginPage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginContent(navController: NavController) {
+fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
     val lightGreen = colorResource(id = R.color.lightGreen)
     val darkGreen = colorResource(id = R.color.darkGreen)
     val darkBlue = colorResource(id = R.color.darkBlue)
@@ -184,6 +184,7 @@ fun LoginContent(navController: NavController) {
                     confirmPassword = "")
                 if (errorMessage == "") {
                     navController.navigate(route = PlantScreens.Home.title)
+                    plantViewModel.addUser(username)
                 }
                 // Check for unentered fields, if username password match, if there is user with this username
             },
@@ -253,7 +254,7 @@ fun ErrorMessage(errorMessage: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignupContent(navController: NavController) {
+fun SignupContent(navController: NavController, plantViewModel: PlantViewModel) {
     val lightGreen = colorResource(id = R.color.lightGreen)
     val darkGreen = colorResource(id = R.color.darkGreen)
     val darkBlue = colorResource(id = R.color.darkBlue)
@@ -334,6 +335,7 @@ fun SignupContent(navController: NavController) {
                     confirmPassword = confirmPassword)
                 if (errorMessage == "") {
                     navController.navigate(route = PlantScreens.Home.title)
+                    plantViewModel.addUser(username)
                 }
             },
             colors = ButtonDefaults.buttonColors(

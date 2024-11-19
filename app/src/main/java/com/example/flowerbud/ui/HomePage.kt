@@ -53,6 +53,7 @@ import kotlinx.coroutines.selects.select
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -67,15 +68,15 @@ fun HomePage(
     // // myPlants stores all <Plant>s in My Plants
     val myPlants: List<UserPlant> = uiState.myPlants
 
-    val dataSource = CalendarDataSource()
-    var selectedDate by remember { mutableStateOf(dataSource.today) }
-    val plantsToWater = mutableListOf<UserPlant>()
-    onDayChange(selectedDate, myPlants, plantsToWater)
+    val dataSource = CalendarDataSource() // Create calendar data source
+    var selectedDate by remember { mutableStateOf(dataSource.today) } // Date selected by user on calendar
+    val plantsToWater = mutableListOf<UserPlant>() // List of plants that need to watered
+    onDayChange(selectedDate, myPlants, plantsToWater) // Populate list of plants that need to watered
 
     val calendarUiModel = dataSource.getData(lastSelectedDate = selectedDate)
 
     ConstraintLayout {
-        val searchPageRef = createRef()
+        val searchPageRef = createRef() // For the floating Add more plants button
         val darkBlue = colorResource(id = R.color.darkBlue)
 
         Column(modifier = modifier.fillMaxSize()) {
@@ -84,41 +85,47 @@ fun HomePage(
                 data = calendarUiModel,
             )
             Content(data = calendarUiModel,
+                // When a different date is clicked:
                 onDateClick = { newDate ->
-                    selectedDate = newDate
-                    onDayChange(selectedDate, myPlants, plantsToWater)
+                    selectedDate = newDate // Selected date updates
+                    onDayChange(selectedDate, myPlants, plantsToWater) // List of plants to be watered is changed
                 },
+                // When the back arrow is clicked:
                 onPreviousClick = {
-                    selectedDate = selectedDate.minusWeeks(1)
-                    onDayChange(selectedDate, myPlants, plantsToWater)
+                    selectedDate = selectedDate.minusWeeks(1) // Selected date goes back a week
+                    onDayChange(selectedDate, myPlants, plantsToWater) // List of plants to be watered is changed
                 },
+                // When the front arrow is clicked:
                 onNextClick = {
-                    selectedDate = selectedDate.plusWeeks(1)
-                    onDayChange(selectedDate, myPlants, plantsToWater)
+                    selectedDate = selectedDate.plusWeeks(1) // Selected date goes forwards a week
+                    onDayChange(selectedDate, myPlants, plantsToWater) // List of plants to be watered is changed
                 })
             if (plantsToWater.isNotEmpty()) {
                 WaterTasks(
                     plantsToWater = plantsToWater,
                     plantViewModel = plantViewModel,
-                    selectedDate = selectedDate
+                    selectedDate = selectedDate,
+                    navController = navController,
                 )
             } else {
                 NoWaterTasks()
             }
         }
-        // Row to contain floating Get Results button
+
+        // Row to contain floating Add more plants button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = modifier
                 .fillMaxWidth()
                 .constrainAs(searchPageRef) {
-                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                    bottom.linkTo(parent.bottom, margin = 5.dp) // Ensures button is floating
                 }
         ) {
-            // Get Results button
+            // Add more plants button
             Button(
                 onClick = {
+                    // Navigates to search page when clicked
                     navController.navigate(route = PlantScreens.Search.title)
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -130,34 +137,32 @@ fun HomePage(
                     .width(350.dp)
             ) {
                 Text("Add more plants", fontSize = 25.sp)
-//                Icon(
-//                    imageVector = Icons.Filled.Add,
-//                    contentDescription = "Add Icon",
-//                    tint = Color.White,
-//                    modifier = Modifier.size(30.dp)
-//                )
             }
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
+// This function shows all the watering tasks for the day (when there are tasks)
 @Composable
 fun WaterTasks(
     plantsToWater: MutableList<UserPlant>,
     plantViewModel: PlantViewModel,
-    selectedDate: LocalDate
+    selectedDate: LocalDate,
+    navController: NavController,
 ) {
     val lightGreen = colorResource(id = R.color.lightGreen)
     Column {
         Spacer(modifier = Modifier.height(35.dp))
         Row() {
+            // Title text
             Text(
                 text = "Watering",
                 fontSize = 40.sp,
                 modifier = Modifier.absolutePadding(35.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
+            // Card showing number of tasks, i.e. number of plants to water
             Card(
                 modifier = Modifier
                     .width(80.dp)
@@ -168,6 +173,7 @@ fun WaterTasks(
                 )
             ) {
                 Text(
+                    // Number tasks, i.e. number of plants to water = Size of list containing all plants to water
                     text = if (plantsToWater.size > 1) {
                         plantsToWater.size.toString() + " tasks"
                     } else {
@@ -177,13 +183,15 @@ fun WaterTasks(
                 )
             }
         }
-//        Spacer(modifier = Modifier.height(10.dp))
+
+        // For each plant that needs watering, show the card for it
         for (plant in plantsToWater) {
-            WaterCard(plant = plant, plantViewModel = plantViewModel, selectedDate = selectedDate)
+            WaterCard(plant = plant, plantViewModel = plantViewModel, selectedDate = selectedDate, navController = navController)
         }
     }
 }
 
+// This function shows when there is no watering tasks scheduled for that day
 @Composable
 fun NoWaterTasks() {
     Box(
@@ -210,6 +218,7 @@ fun NoWaterTasks() {
     }
 }
 
+// This helper function re-populates the list of plants that need to be watered when user selects a different date
 fun onDayChange(
     selectedDate: LocalDate,
     myPlants: List<UserPlant>,
@@ -217,52 +226,64 @@ fun onDayChange(
 ) {
     plantsToWater.clear()
     var filteredPlants = emptyList<UserPlant>()
-    if (selectedDate == LocalDate.now()) {
+    if (selectedDate == LocalDate.now()) { // If date selected is today
         filteredPlants =
             myPlants.filter { plant ->
                 plant.nextWaterDay.isBefore(selectedDate) || plant.nextWaterDay == selectedDate || plant.lastWateredDates.contains(
-                    selectedDate
+                    selectedDate // Show overdue plants, plants to be watered today and plants watered today
                 )
             }
-    } else if (selectedDate.isAfter(LocalDate.now())) {
+    } else if (selectedDate.isAfter(LocalDate.now())) { // If date selected is in future
         filteredPlants =
-            myPlants.filter { plant -> plant.nextWaterDay == selectedDate }
-    } else if (selectedDate.isBefore(LocalDate.now())) {
+            myPlants.filter { plant -> plant.nextWaterDay == selectedDate } // Show plants to be watered on that day
+    } else if (selectedDate.isBefore(LocalDate.now())) { // If date selected is in the past
         filteredPlants =
-            myPlants.filter { plant -> plant.lastWateredDates.contains(selectedDate) }
+            myPlants.filter { plant -> plant.lastWateredDates.contains(selectedDate) } // Show plants watered on that day
     }
     for (plant in filteredPlants) {
         plantsToWater.add(plant)
     }
 }
 
+// This function checks if the watering for a specific plant is overdue (on the selected date)
+// Note that overdue means the watering task is past it's due date
 fun isOverdue(selectedDate: LocalDate, plant: UserPlant): Boolean {
+    // If the selected date is not today, then there is no possibility of there being overdue plants
     if (selectedDate != LocalDate.now()) {
         return false
     }
+    // If the next day for watering the plant is before today, then the plant is overdue
     if (plant.nextWaterDay.isBefore(selectedDate)) {
         return true
     }
     return false
 }
 
+
 @Composable
-fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: LocalDate) {
+fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: LocalDate, navController: NavController) {
     val lightGreen = colorResource(id = R.color.lightGreen)
     val middleGreen = colorResource(id = R.color.middleGreen)
     val darkGreen = colorResource(id = R.color.darkGreen)
     val lightGrey = colorResource(id = R.color.lightGrey)
+    val red = colorResource(id = R.color.red)
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .padding(40.dp, 20.dp),
+            .padding(40.dp, 20.dp)
+            .clickable {
+                // When clicked, navigate to PlantDetailsPage(id = plant.plantId)
+                navController.navigate(route = "details/${plant.plantId}")
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
             containerColor = lightGreen
         )
     ) {
         Row() {
+
+            // Image of plant
             Image(
                 painter = painterResource(id = plant.plantImage),
                 contentDescription = plant.plantName,
@@ -272,41 +293,62 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                 modifier = Modifier.width(250.dp)
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Plant name
                 Text(
                     text = plant.plantName,
-                    fontSize = 30.sp
+                    fontSize = 30.sp,
+                    style = androidx.compose.ui.text.TextStyle(
+                        lineHeight = 40.sp
+                    )
                 )
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Card specifying the due date for the plant
                 Card(
                     modifier = Modifier.widthIn(max = 220.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isOverdue(selectedDate, plant)) {
-                            middleGreen
-                        } else lightGreen
+                            red // Card is red if overdue
+                        } else lightGreen // Otherwise it is light green
                     )
                 ) {
                     Text(
-                        text = if (!isOverdue(selectedDate, plant)) {
-                            "Due date: Today"
-                        } else {
-                            "Due date: " + plant.nextWaterDay.format(
-                                DateTimeFormatter.ofLocalizedDate(
-                                    FormatStyle.FULL
-                                )
-                            )
+                        text = if (!isOverdue(selectedDate, plant)) { // If plant is not overdue
+                            if (!plant.lastWateredDates.contains(selectedDate)) { //If plant has not been watered
+                                if (selectedDate.isAfter(LocalDate.now())) { // If watering task is in the future
+                                    "Due on this day"
+                                }
+                                else "Due date: Today" // If watering task is today
+                            }
+                            else {
+                                "Watering completed" // If watering task has been completed
+                            }
+                        } else { // If plant is overdue
+                            // User is told how many days overdue it is
+                            // Number of days overdue is calculated by calculating difference between today and watering day
+                            if (ChronoUnit.DAYS.between(plant.nextWaterDay, LocalDate.now()) == 1L) {
+                                "Due 1 day ago"
+                            }
+                            else {"Due " + ChronoUnit.DAYS.between(plant.nextWaterDay, LocalDate.now()) + " days ago"}
                         },
                         modifier = Modifier.padding(10.dp, 10.dp),
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        color = if (!isOverdue(selectedDate, plant)) Color.Black else Color.White
                     )
                 }
             }
+
+            // Tick button for user to click when they have watered the plant
             IconButton(
-                onClick = { plantViewModel.waterPlant(plant.plantId) },
+                onClick = { plantViewModel.waterPlant(plant.plantId) }, // When clicked, data points for plant change (see waterPlant function for more info)
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
                     .background(
+                        // If the selected date is not in the past and the plant has not been watered on that day, then button is grey (task not completed)
+                        // Otherwise, if the selected date is in the past or has been watered on that day, then the button is dark green (task completed)
                         color = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(
                                 selectedDate
                             )
@@ -317,6 +359,7 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                         },
                     )
                     .align(Alignment.CenterVertically),
+                // Button is only enabled if the selected date is today and the plant has not been yet watered
                 enabled = if (selectedDate == LocalDate.now() && !plant.lastWateredDates.contains(
                         selectedDate
                     )
@@ -325,6 +368,8 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = "Check Icon",
+                    // If the selected date is not in the past and the plant has not been watered on that day, then tick icon is dark green (task not completed)
+                    // Otherwise, if the selected date is in the past or has been watered on that day, then the tick icon is light grey (task completed)
                     tint = if (!selectedDate.isBefore(LocalDate.now()) && !plant.lastWateredDates.contains(
                             selectedDate
                         )
@@ -396,7 +441,6 @@ fun Content(
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowForward, contentDescription = "Next",
-//                tint = darkBlue
             )
         }
     }

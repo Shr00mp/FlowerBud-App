@@ -119,9 +119,10 @@ fun idToPlant(id: String?) : Plant {
 // Class for data stored across different pages (i.e. ui state that can be accessed by entire app)
 data class PlantUiState(
     val favourites: List<String> = emptyList<String>(),
-//    val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now(), plantName = "Spider Plant", plantImage = R.drawable.spiderplant))
-    val myPlants: List<UserPlant> = emptyList<UserPlant>(),
-    val quizChoices: QuizChoices = QuizChoices()
+    val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now().minusDays(1), plantName = "Spider Plant", plantImage = R.drawable.spiderplant)),
+//    val myPlants: List<UserPlant> = emptyList<UserPlant>(),
+    val quizChoices: QuizChoices = QuizChoices(),
+    val username: String? = null
 )
 // Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
@@ -144,6 +145,7 @@ data class QuizChoices (
     var lightEnd: Int = 3,
     var toxicYn: Boolean? = null,
     var outdoor: Boolean? = null,
+    var indoor: Boolean? = null,
 )
 
 /*
@@ -194,6 +196,10 @@ class PlantViewModel: ViewModel() {
         _uiState.update { currentState -> currentState.copy(myPlants = mappedPlant) }
     }
 
+    fun addUser(username: String) {
+        _uiState.update { currentState -> currentState.copy(username = username) }
+    }
+
     fun updatePriceStart(priceStart: Int) {
         val newChoices = _uiState.value.quizChoices.copy(priceStart = priceStart)
         _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
@@ -241,6 +247,11 @@ class PlantViewModel: ViewModel() {
 
     fun updateOutdoor(outdoor: Boolean) {
         val newChoices = _uiState.value.quizChoices.copy(outdoor = outdoor)
+        _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
+    }
+
+    fun updateIndoor(indoor: Boolean) {
+        val newChoices = _uiState.value.quizChoices.copy(indoor = indoor)
         _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
     }
 }

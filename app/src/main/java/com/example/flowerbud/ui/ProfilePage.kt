@@ -74,8 +74,9 @@ fun ProfilePage(
             )
             Spacer(modifier = Modifier.width(15.dp))
             val username = "Sharon"
+
             Text(
-                "Welcome back, $username.",
+                "Welcome back, ${uiState.username}.",
                 fontSize = 40.sp,
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
             )

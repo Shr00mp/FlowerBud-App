@@ -45,7 +45,8 @@ fun getPlants(
     spaceStart: Int, spaceEnd: Int,
     lightStart: Int, lightEnd: Int,
     toxic_yn: Boolean?,
-    outdoor: Boolean?
+    outdoor: Boolean?,
+    indoor: Boolean?
 ): MutableList<Plant> {
     val allScores = MutableList(11) { 0 }
     // Calculates a score for each plant based on how many of the user's preference criteria it fits
@@ -68,6 +69,9 @@ fun getPlants(
         }
         if (plant.outdoor == outdoor) {
             allScores[i] += 1
+        }
+        else if (outdoor == true && indoor == true) {
+            allScores[i] += 1 // When user has selected either indoor or outdoor is fine
         }
     }
     // Gets the top 5 plants by index
@@ -128,7 +132,7 @@ fun QuizContent(
         ) {
             Row(modifier = modifier.align(alignment = Alignment.CenterHorizontally)) {
                 Text(
-                    text = "PLANT QUIZ",
+                    text = "Plant Quiz",
                     fontSize = 40.sp,
                     modifier = Modifier.absolutePadding(0.dp, 40.dp, 0.dp, 15.dp)
                 )
@@ -180,7 +184,7 @@ fun QuizContent(
                             valueRange = 0f..50f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = "£" + uiState.quizChoices.priceStart.toString() + " to " + "£" + uiState.quizChoices.priceStart.toString())
+                        Text(text = "£" + uiState.quizChoices.priceStart.toString() + " to " + "£" + uiState.quizChoices.priceEnd.toString())
                     }
                 }
             }
@@ -334,7 +338,7 @@ fun QuizContent(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(175.dp)
+                    .height(200.dp)
                     .padding(30.dp, 10.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                 colors = CardDefaults.cardColors(
@@ -343,10 +347,15 @@ fun QuizContent(
             ) {
                 Column() {
                     Text(
-                        text = "Do you have pets a plant could be toxic to?",
+                        text = "Do you have any pets?",
                         modifier = Modifier.absolutePadding(30.dp, 20.dp, 0.dp, 0.dp),
                         fontSize = 25.sp,
                         style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    Text(
+                        text = "(Some plants could be toxic to pets)",
+                        modifier = Modifier.absolutePadding(30.dp, 5.dp)
                     )
 
                     Column(
@@ -426,7 +435,7 @@ fun QuizContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .absolutePadding(30.dp, 0.dp, 0.dp, 50.dp),
+                            .absolutePadding(0.dp, 0.dp, 0.dp, 0.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
@@ -434,43 +443,65 @@ fun QuizContent(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .absolutePadding(0.dp, 5.dp)
                         ) {
                             // Indoor button
                             Button(
                                 onClick = {
                                     plantViewModel.updateOutdoor(false)
+                                    plantViewModel.updateIndoor(true)
                                 },
                                 modifier = Modifier
-                                    .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
-                                    .width(200.dp),
+                                    .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
+                                    .width(150.dp),
                                 border = BorderStroke(
-                                    2.dp, if (uiState.quizChoices.outdoor == false) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if(uiState.quizChoices.outdoor == false) darkGreen else grayColour,
-                                    contentColor = if(uiState.quizChoices.outdoor == false) Color.White else Color.Gray
+                                    containerColor = if(uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("Indoor", fontSize = 25.sp)
                             }
+                            Spacer(modifier = Modifier.width(20.dp))
                             // Outdoor button
                             Button(
                                 onClick = {
                                     plantViewModel.updateOutdoor(true)
+                                    plantViewModel.updateIndoor(false)
                                 },
                                 modifier = Modifier
-                                    .absolutePadding(15.dp, 20.dp, 30.dp, 0.dp)
-                                    .width(200.dp),
+                                    .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
+                                    .width(150.dp),
                                 border = BorderStroke(
-                                    2.dp, if (uiState.quizChoices.outdoor == true) darkGreen else Color.Gray
+                                    2.dp, if (uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == false) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if(uiState.quizChoices.outdoor == true) darkGreen else grayColour,
-                                    contentColor = if(uiState.quizChoices.outdoor == true) Color.White else Color.Gray
+                                    containerColor = if(uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == false) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == false) Color.White else Color.Gray
                                 )
                             ) {
                                 Text("Outdoor", fontSize = 25.sp)
+                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                            // Either button
+                            Button(
+                                onClick = {
+                                    plantViewModel.updateOutdoor(true)
+                                    plantViewModel.updateIndoor(true)
+                                },
+                                modifier = Modifier
+                                    .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
+                                    .width(150.dp),
+                                border = BorderStroke(
+                                    2.dp, if (uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == true) darkGreen else Color.Gray
+                                ),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if(uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == true) darkGreen else grayColour,
+                                    contentColor = if(uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == true) Color.White else Color.Gray
+                                )
+                            ) {
+                                Text("Either", fontSize = 25.sp)
                             }
                         }
                     }
@@ -498,7 +529,8 @@ fun QuizContent(
                         uiState.quizChoices.waterStart, uiState.quizChoices.waterEnd,
                         uiState.quizChoices.spaceStart, uiState.quizChoices.spaceEnd,
                         uiState.quizChoices.lightStart, uiState.quizChoices.lightEnd,
-                        uiState.quizChoices.toxicYn, uiState.quizChoices.outdoor)
+                        uiState.quizChoices.toxicYn, uiState.quizChoices.outdoor,
+                        uiState.quizChoices.indoor)
                     top5Plants.addAll(top5Results)
                     onContentChange("Results")// content = "Results" so display changes to ResultsContent()
                 },
@@ -544,7 +576,7 @@ fun ResultsContent(
                     .padding(20.dp, 0.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ){
-                Text("YOUR TOP 5 RESULTS", fontSize = 40.sp)
+                Text("Your Top 5 Results", fontSize = 40.sp)
             }
             Spacer(modifier = Modifier.height(30.dp))
 
