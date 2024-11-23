@@ -10,17 +10,22 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +36,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.flowerbud.R
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -71,6 +81,7 @@ fun CameraPreview(
     imageBitmap: Bitmap?,
     onLaunchCamera: () -> Unit
 ) {
+    val darkBlue = colorResource(id = R.color.darkBlue)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -78,8 +89,15 @@ fun CameraPreview(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Button(onClick = onLaunchCamera) { // button with 'Take Picture' text; on clicking it, onLaunchCamera is called
-            Text("Take Picture")
+        Button(
+            onClick = onLaunchCamera,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = darkBlue,
+                contentColor = Color.White
+            ),
+            modifier = Modifier.height(60.dp).width(250.dp)
+        ) { // button with 'Take Picture' text; on clicking it, onLaunchCamera is called
+            Text("Take Picture", fontSize = 20.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -97,6 +115,7 @@ fun ImageDetailsSection(
     imageDetails: TextFieldValue,
     onImageDetailsChange: (TextFieldValue) -> Unit
 ) {
+    val darkBlue = colorResource(id = R.color.darkBlue)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -104,7 +123,7 @@ fun ImageDetailsSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = "Additional Comments") // label "Additional Comments"
+        Text(text = "Additional Comments", fontSize = 20.sp) // label "Additional Comments"
         BasicTextField(    // TextField where user can enter image details
             value = imageDetails,
             onValueChange = onImageDetailsChange,  // call onImageDetailsChange function whenever the text field value is changed
@@ -112,7 +131,19 @@ fun ImageDetailsSection(
                 .fillMaxWidth()
                 .height(100.dp)
                 .padding(8.dp)
-                .border(1.dp, MaterialTheme.colorScheme.primary)
+                .border(width = 1.5.dp, color = darkBlue, shape = RoundedCornerShape(8.dp)),
+            textStyle = TextStyle(
+                fontSize = 18.sp, // Adjust the font size here
+            ),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .padding(12.dp) // Adjust padding here
+                        .fillMaxSize()
+                ) {
+                    innerTextField()
+                }
+            }
         )
     }
 }
@@ -147,6 +178,7 @@ fun DateSelectionSection(
     onDateSelected: (String) -> Unit,
     onShowDatePicker: () -> Unit
 ) {
+    val darkBlue = colorResource(id = R.color.darkBlue)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -154,10 +186,17 @@ fun DateSelectionSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Button(onClick = onShowDatePicker) {  // button which triggers DatePicker popup
-            Text(text = "Select Date")
+        Button(
+            onClick = onShowDatePicker,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = darkBlue,
+                contentColor = Color.White
+            ),
+            modifier = Modifier.height(60.dp).width(250.dp)
+        ) {  // button which triggers DatePicker popup
+            Text(text = "Select different date", fontSize = 20.sp)
         }
-        Text(text = "${convertDateFormat(selectedDate,"dd/MM/yyyy", "dd MMM, yyyy")}", modifier = Modifier.padding(vertical = 8.dp)) // text showing the selected date
+        Text(text = "Selected date: ${convertDateFormat(selectedDate,"dd/MM/yyyy", "dd MMM, yyyy")}", modifier = Modifier.padding(vertical = 8.dp)) // text showing the selected date
     }
 }
 
@@ -174,6 +213,8 @@ fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, m
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         imageBitmap = bitmap
     }
+
+    val darkBlue = colorResource(id = R.color.darkBlue)
 
     // Camera permission logic
     CameraPermission(
@@ -205,6 +246,12 @@ fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, m
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        Text(
+            text = "Make a journal entry",
+            fontSize = 40.sp,
+            modifier = Modifier.absolutePadding(30.dp, 40.dp, 0.dp, 40.dp)
+        )
+
         ImageDatePickerDialog(context, onDateSelected = { date ->
             selectedDate = date
         }, show, { show = false})
@@ -215,16 +262,17 @@ fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, m
             onShowDatePicker = showDatePicker // Pass the function to show the date picker
         )
 
-        // The "Additional comments" section
-        ImageDetailsSection(imageDetails = imageDetails, onImageDetailsChange = { imageDetails = it })
-
         // Section for taking a picture
         CameraPreview(imageBitmap = imageBitmap, onLaunchCamera = takePicture)
+
+        // The "Additional comments" section
+        ImageDetailsSection(imageDetails = imageDetails, onImageDetailsChange = { imageDetails = it })
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Submit Button
-        Button(onClick = {
+        Button(
+            onClick = {
             /* Error message if
             - there is not image
             - or date is not selected
@@ -245,8 +293,14 @@ fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, m
                 plantViewModel.addImg(JournalImg(selectedDate, bitmap, imageDetails.text))
                 navController.navigate(PlantScreens.Journal.title)
             }
-        }) {
-            Text("Submit")
+        },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = darkBlue,
+                contentColor = Color.White
+            ),
+            modifier = Modifier.height(60.dp).width(250.dp)
+        ) {
+            Text("Submit", fontSize = 20.sp)
         }
     }
 }
