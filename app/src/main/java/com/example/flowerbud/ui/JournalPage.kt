@@ -2,7 +2,6 @@ package com.example.flowerbud.ui
 
 import android.Manifest
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.Toast
@@ -26,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,33 +42,8 @@ import java.util.Calendar
 
 @Composable
 fun JournalPage(navController: NavController, plantViewModel: PlantViewModel, modifier: Modifier = Modifier) {
-    val DATE_KEY = "selected_date"
-    val IMAGE_KEY = "captured_image"
+    val uiState by plantViewModel.uiState.collectAsState()
 
-    var selectedDate by remember { mutableStateOf("") }
-//    val byteArray = byte[]
-
-//    val selectedDate = intent.getStringExtra(DATE_KEY) ?: "No date selected"
-//    val byteArray = intent.getByteArrayExtra(IMAGE_KEY)
-    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-//    if (byteArray != null) {
-//        imageBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-//    }
-    DisplayScreen(
-        selectedDate = selectedDate,
-        imageBitmap = imageBitmap,
-        onAddImageClick = { }
-    )
-}
-
-
-
-@Composable
-fun DisplayScreen(
-    selectedDate: String,
-    imageBitmap: Bitmap?,
-    onAddImageClick: () -> Unit
-) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,232 +51,41 @@ fun DisplayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = selectedDate,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        imageBitmap?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = "Selected Image",
-                modifier = Modifier
-                    .size(200.dp)
-                    .padding(bottom = 16.dp)
-            )
-        } ?: run {
-            Text(
-                text = "No image available",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+        if (uiState.imgs.isEmpty()) {
+            Text(text = "No Journal Image right now. Click the button below to take one")
         }
+        uiState.imgs.map{img -> ImgCard(img)}
 
-        Button(onClick = onAddImageClick) {
+        Button(onClick = { navController.navigate(PlantScreens.CameraScreen.title) }) {
             Text(text = "+")
         }
     }
 }
 
-// Composable Function for Camera Permission Handling
-@Composable
-fun CameraPermission(
-    onPermissionGranted: () -> Unit,
-    onPermissionDenied: () -> Unit
-) {
-    val context = LocalContext.current
 
-    // Camera permission launcher
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                onPermissionGranted()
-            } else {
-                onPermissionDenied()
-            }
-        }
+
+@Composable
+fun ImgCard(
+    img: JournalImg
+) {
+    Text(
+        text = img.selectedDate,
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(bottom = 16.dp)
     )
-
-    // Launch permission request when composable is first launched
-    LaunchedEffect(Unit) {
-        requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-    }
-}
-
-// Composable Function for Camera Preview
-@Composable
-fun CameraPreview(
-    imageBitmap: Bitmap?,
-    onLaunchCamera: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Button(onClick = onLaunchCamera) {
-            Text("Take Picture")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        imageBitmap?.let {
-            Image(bitmap = it.asImageBitmap(), contentDescription = "Captured Image", modifier = Modifier.size(200.dp))
-        }
-    }
-}
-
-// Composable Function for Image Details (Additional Comments)
-@Composable
-fun ImageDetailsSection(
-    imageDetails: TextFieldValue,
-    onImageDetailsChange: (TextFieldValue) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(text = "Additional Comments")
-        BasicTextField(
-            value = imageDetails,
-            onValueChange = onImageDetailsChange,
+    img.bitmap?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            contentDescription = "Selected Image",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(8.dp)
-                .border(1.dp, MaterialTheme.colorScheme.primary)
+                .size(200.dp)
+                .padding(bottom = 16.dp)
         )
-    }
-}
-
-// Composable Function for Date Picker Dialog
-@Composable
-fun showDatePickerDialog(context: android.content.Context, onDateSelected: (String) -> Unit) {
-    val calendar = Calendar.getInstance()
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val formattedDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
-            onDateSelected(formattedDate)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-    datePickerDialog.show()
-}
-
-// Composable Function for Date Selection
-@Composable
-fun DateSelectionSection(
-    selectedDate: String,
-    onDateSelected: (String) -> Unit,
-    onShowDatePicker: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Button(onClick = onShowDatePicker) {
-            Text(text = "Select Date")
-        }
-        Text(text = selectedDate, modifier = Modifier.padding(vertical = 8.dp))
-    }
-}
-
-// Main Composable for the Screen
-@Composable
-fun MainScreen() {
-    var selectedDate by remember { mutableStateOf("") }
-    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var imageDetails by remember { mutableStateOf(TextFieldValue("")) }
-    var hasPermission by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    // Camera launcher for taking picture
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        imageBitmap = bitmap
-    }
-
-    // Camera permission logic
-    CameraPermission(
-        onPermissionGranted = { hasPermission = true },
-        onPermissionDenied = {
-            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-        }
-    )
-
-    // Handle Take Picture Button click
-    val takePicture = {
-        if (hasPermission) {
-            cameraLauncher.launch(null)
-        } else {
-            Toast.makeText(context, "Please grant camera permission.", Toast.LENGTH_SHORT).show()
-        }
-    }
-    var show by remember{ mutableStateOf(false) }
-    // Function to show DatePicker Dialog
-    val showDatePicker = {
-        show = true
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        if(show) {
-            showDatePickerDialog(context) { date ->
-                selectedDate = date
-            }
-        }
-        DateSelectionSection(
-            selectedDate = selectedDate,
-            onDateSelected = { selectedDate = it },
-            onShowDatePicker = showDatePicker // Pass the function to show the date picker
+    } ?: run {
+        Text(
+            text = "No image available",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-
-        // The "Additional comments" section will now always be visible
-        ImageDetailsSection(imageDetails = imageDetails, onImageDetailsChange = { imageDetails = it })
-
-        CameraPreview(imageBitmap = imageBitmap, onLaunchCamera = takePicture)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Submit Button
-        Button(onClick = {
-            if (selectedDate.isEmpty() || imageDetails.text.isEmpty()) {
-                Toast.makeText(context, "Please enter all details!", Toast.LENGTH_SHORT).show()
-                return@Button
-            }
-
-            // Submission logic here
-            Toast.makeText(context, "Details Submitted!", Toast.LENGTH_SHORT).show()
-
-            // Example: Convert the image to a byte array
-            imageBitmap?.let { bitmap ->
-                val stream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                val byteArray = stream.toByteArray()
-
-                // Example of handling byteArray for submission
-                // This could be saved to a database or passed to another activity
-            }
-        }) {
-            Text("Submit")
-        }
     }
 }

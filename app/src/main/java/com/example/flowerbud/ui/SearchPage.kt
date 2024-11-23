@@ -23,10 +23,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -49,12 +51,14 @@ import com.example.flowerbud.R
 
 
 // Function that creates a search bar composable
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     query: String, // The current text in the search bar, dynamically updated as the user types
     onQueryChanged: (String) -> Unit, // A callback function that handles changes in the search query (text input)
     onSearch: () -> Unit // A callback function that triggers the search action when the user submits the search
 ) {
+    val darkBlue = colorResource(id = R.color.darkBlue)
     // OutlinedTextField resembles a search bar
     OutlinedTextField(
         shape = RoundedCornerShape(20.dp),
@@ -80,7 +84,15 @@ fun SearchBar(
             onSearch = {
                 onSearch() // Calls the onSearch function when the search button on the keyboard is pressed
             }
-        )
+        ),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = darkBlue,
+//                unfocusedBorderColor = darkGreen,
+            focusedLabelColor = darkBlue,
+//                unfocusedLabelColor = darkGreen,
+            focusedLeadingIconColor = darkBlue,
+//                unfocusedLeadingIconColor = darkGreen
+        ),
     )
 }
 

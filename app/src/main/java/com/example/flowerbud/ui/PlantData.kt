@@ -1,5 +1,6 @@
 package com.example.flowerbud.ui
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import com.example.flowerbud.R
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,6 +103,7 @@ enum class PlantScreens(var title: String) {
     Quiz(title = "Quiz"),
     Search(title = "Search"),
     Journal(title= "Journal"),
+    CameraScreen(title = "CameraScreen"),
     Profile(title = "Profile"),
     Login(title = "Login"),
     PlantDetails(title = "Plant Details")
@@ -122,7 +124,8 @@ data class PlantUiState(
     val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now().minusDays(1), plantName = "Spider Plant", plantImage = R.drawable.spiderplant)),
 //    val myPlants: List<UserPlant> = emptyList<UserPlant>(),
     val quizChoices: QuizChoices = QuizChoices(),
-    val username: String? = null
+    val username: String? = null,
+    val imgs: List<JournalImg> = emptyList<JournalImg>()
 )
 // Class for plants that the user owns (may contain water schedule)
 data class UserPlant (
@@ -254,4 +257,14 @@ class PlantViewModel: ViewModel() {
         val newChoices = _uiState.value.quizChoices.copy(indoor = indoor)
         _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
     }
+
+    fun addImg(img: JournalImg) {
+        val updatedImgs = _uiState.value.imgs + img
+        _uiState.update { currentState -> currentState.copy(imgs = updatedImgs) }
+    }
 }
+
+data class JournalImg (
+    val selectedDate: String,
+    val bitmap: Bitmap?,
+)

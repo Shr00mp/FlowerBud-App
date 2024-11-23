@@ -40,7 +40,7 @@ fun PlantApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             /*
-            Specifies routes for when each page function should be called
+            Specifies routes for when each page function should be called           
             e.g. If route is PlantScreens.home.title (= "Home"), then HomePage() is called
             */
             composable(route = PlantScreens.Login.title) {
@@ -57,6 +57,9 @@ fun PlantApp(
             }
             composable(route = PlantScreens.Journal.title) {
                 JournalPage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
+            }
+            composable(route = PlantScreens.CameraScreen.title) {
+                CameraScreen(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
             }
             composable(route = PlantScreens.Profile.title) {
                 ProfilePage(navController = navController, plantViewModel = plantViewModel, modifier = modifier)
