@@ -44,6 +44,7 @@ fun ProfilePage(
     val darkBlue = colorResource(id = R.color.darkBlue)
 
     val uiState by plantViewModel.uiState.collectAsState()
+
     // favouritePlants stores all <Plant>s in Favourites
     val favouritePlants: List<Plant> =
         uiState.favourites.map { plantId -> allPlants.find { it.plantId == plantId }!! }

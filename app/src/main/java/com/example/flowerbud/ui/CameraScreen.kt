@@ -37,23 +37,24 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import java.io.ByteArrayOutputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
+// Composable for dealing with camera permission
 @Composable
 fun CameraPermission(
     onPermissionGranted: () -> Unit,
     onPermissionDenied: () -> Unit
 ) {
-    val context = LocalContext.current
-
     // Camera permission launcher
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                onPermissionGranted()
+                onPermissionGranted() // Call onPermissionGranted if user is allowed to use camera
             } else {
-                onPermissionDenied()
+                onPermissionDenied() // Call onPermissionDenied if user is not allowed to use camera
             }
         }
     )
@@ -64,7 +65,7 @@ fun CameraPermission(
     }
 }
 
-// Composable Function for Camera Preview
+// Section for taking a picture
 @Composable
 fun CameraPreview(
     imageBitmap: Bitmap?,
@@ -77,19 +78,20 @@ fun CameraPreview(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Button(onClick = onLaunchCamera) {
+        Button(onClick = onLaunchCamera) { // button with 'Take Picture' text; on clicking it, onLaunchCamera is called
             Text("Take Picture")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Display the picture taken as an Image composable
         imageBitmap?.let {
             Image(bitmap = it.asImageBitmap(), contentDescription = "Captured Image", modifier = Modifier.size(200.dp))
         }
     }
 }
 
-// Composable Function for Image Details (Additional Comments)
+// Section for Image Details, which includes a label "Additional Comments" and TextField
 @Composable
 fun ImageDetailsSection(
     imageDetails: TextFieldValue,
@@ -102,10 +104,10 @@ fun ImageDetailsSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = "Additional Comments")
-        BasicTextField(
+        Text(text = "Additional Comments") // label "Additional Comments"
+        BasicTextField(    // TextField where user can enter image details
             value = imageDetails,
-            onValueChange = onImageDetailsChange,
+            onValueChange = onImageDetailsChange,  // call onImageDetailsChange function whenever the text field value is changed
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
@@ -115,24 +117,30 @@ fun ImageDetailsSection(
     }
 }
 
-// Composable Function for Date Picker Dialog
+// DatePicker popup where user selects the date for the image
 @Composable
-fun showDatePickerDialog(context: Context, onDateSelected: (String) -> Unit) {
+fun ImageDatePickerDialog(context: Context, onDateSelected: (String) -> Unit, show: Boolean, onHide: () -> Unit) {
     val calendar = Calendar.getInstance()
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val formattedDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
-            onDateSelected(formattedDate)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-    datePickerDialog.show()
+    if (show) {
+        DatePickerDialog(
+            context,
+            /*
+            * function that is called on date change
+            * which formats the selected date and saves it
+            */
+            { _, year, month, dayOfMonth ->
+                val formattedDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
+                onDateSelected(formattedDate)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+        onHide()  // toggle 'show' flag after the popup disappears
+    }
 }
 
-// Composable Function for Date Selection
+// Section where user can pick a date
 @Composable
 fun DateSelectionSection(
     selectedDate: String,
@@ -146,20 +154,20 @@ fun DateSelectionSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Button(onClick = onShowDatePicker) {
+        Button(onClick = onShowDatePicker) {  // button which triggers DatePicker popup
             Text(text = "Select Date")
         }
-        Text(text = selectedDate, modifier = Modifier.padding(vertical = 8.dp))
+        Text(text = "${convertDateFormat(selectedDate,"dd/MM/yyyy", "dd MMM, yyyy")}", modifier = Modifier.padding(vertical = 8.dp)) // text showing the selected date
     }
 }
 
 // Main Composable for the Screen
 @Composable
 fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, modifier: Modifier = Modifier) {
-    var selectedDate by remember { mutableStateOf("") }
-    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var imageDetails by remember { mutableStateOf(TextFieldValue("")) }
-    var hasPermission by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf(formatCurrentDate()) }      // state variable 'selectedDate' whose initial value is today's date
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }       // state variable 'imageBitmap' which stores the picture taken
+    var imageDetails by remember { mutableStateOf(TextFieldValue("")) }      // state variable 'imageDetails' which stores user's comments about the image
+    var hasPermission by remember { mutableStateOf(false) }        // state variable 'hasPermission' which stores where user has camera permission
     val context = LocalContext.current
 
     // Camera launcher for taking picture
@@ -197,43 +205,57 @@ fun CameraScreen(navController: NavController, plantViewModel: PlantViewModel, m
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        if(show) {
-            showDatePickerDialog(context) { date ->
-                selectedDate = date
-            }
-        }
-        DateSelectionSection(
+        ImageDatePickerDialog(context, onDateSelected = { date ->
+            selectedDate = date
+        }, show, { show = false})
+
+        DateSelectionSection( // Section for Picking a date
             selectedDate = selectedDate,
             onDateSelected = { selectedDate = it },
             onShowDatePicker = showDatePicker // Pass the function to show the date picker
         )
 
-        // The "Additional comments" section will now always be visible
+        // The "Additional comments" section
         ImageDetailsSection(imageDetails = imageDetails, onImageDetailsChange = { imageDetails = it })
 
+        // Section for taking a picture
         CameraPreview(imageBitmap = imageBitmap, onLaunchCamera = takePicture)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Submit Button
         Button(onClick = {
-            if (selectedDate.isEmpty() || imageDetails.text.isEmpty()) {
+            /* Error message if
+            - there is not image
+            - or date is not selected
+            - or "Additional comments" is empty
+            */
+            if (selectedDate.isEmpty() || imageDetails.text.isEmpty() || imageBitmap == null) {
                 Toast.makeText(context, "Please enter all details!", Toast.LENGTH_SHORT).show()
                 return@Button
             }
 
-            // Submission logic here
+            // Success submission alert
             Toast.makeText(context, "Details Submitted!", Toast.LENGTH_SHORT).show()
 
-            // Example: Convert the image to a byte array
+            // Save data into viewModel & navigate to JournalPage
             imageBitmap?.let { bitmap ->
                 val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                plantViewModel.addImg(JournalImg(selectedDate, bitmap))
+                plantViewModel.addImg(JournalImg(selectedDate, bitmap, imageDetails.text))
                 navController.navigate(PlantScreens.Journal.title)
             }
         }) {
             Text("Submit")
         }
     }
+}
+
+// Function to get current date with the format "dd/MM/yyyy"
+fun formatCurrentDate(): String {
+    val today = LocalDate.now();
+    // Define the desired format (e.g., "dd/MM/yyyy")
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    // Convert today to a formatted String
+    return today.format(formatter);
 }

@@ -183,8 +183,8 @@ fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
                     password = password,
                     confirmPassword = "")
                 if (errorMessage == "") {
-                    navController.navigate(route = PlantScreens.Home.title)
                     plantViewModel.addUser(username)
+                    navController.navigate(route = PlantScreens.Home.title)
                 }
                 // Check for unentered fields, if username password match, if there is user with this username
             },

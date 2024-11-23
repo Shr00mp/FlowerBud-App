@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Locale
 
 data class Plant(
     val name: String,
@@ -122,7 +124,8 @@ fun idToPlant(id: String?) : Plant {
 data class PlantUiState(
     val favourites: List<String> = emptyList<String>(),
     val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now().minusDays(1), plantName = "Spider Plant", plantImage = R.drawable.spiderplant)),
-//    val myPlants: List<UserPlant> = emptyList<UserPlant>(),
+
+//    val myPlants: List<UserPlant> = emptyList<UserPlant>()
     val quizChoices: QuizChoices = QuizChoices(),
     val username: String? = null,
     val imgs: List<JournalImg> = emptyList<JournalImg>()
@@ -267,4 +270,20 @@ class PlantViewModel: ViewModel() {
 data class JournalImg (
     val selectedDate: String,
     val bitmap: Bitmap?,
+    val imageDetails: String
 )
+
+// function to convert a date format to another format
+fun convertDateFormat(inputDate: String, inputFormat: String, outputFormat: String): String? {
+    // Define the input date format
+    val inputDateFormat = SimpleDateFormat(inputFormat, Locale.getDefault())
+
+    // Parse the input date string to Date object
+    val date = inputDateFormat.parse(inputDate)
+
+    // Define the output date format
+    val outputDateFormat = SimpleDateFormat(outputFormat, Locale.getDefault())
+
+    // Return the formatted date string or null if the input is invalid
+    return date?.let { outputDateFormat.format(it) }
+}

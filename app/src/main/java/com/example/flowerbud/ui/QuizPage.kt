@@ -484,6 +484,7 @@ fun QuizContent(
                                 Text("Outdoor", fontSize = 25.sp)
                             }
                             Spacer(modifier = Modifier.width(20.dp))
+
                             // Either button
                             Button(
                                 onClick = {
