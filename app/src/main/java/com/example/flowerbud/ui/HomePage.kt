@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -79,7 +81,7 @@ fun HomePage(
         val searchPageRef = createRef() // For the floating Add more plants button
         val darkBlue = colorResource(id = R.color.darkBlue)
 
-        Column(modifier = modifier.fillMaxSize()) {
+        Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Spacer(modifier = Modifier.height(25.dp))
             Header(
                 data = calendarUiModel,
@@ -188,6 +190,7 @@ fun WaterTasks(
         for (plant in plantsToWater) {
             WaterCard(plant = plant, plantViewModel = plantViewModel, selectedDate = selectedDate, navController = navController)
         }
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 
@@ -271,7 +274,7 @@ fun WaterCard(plant: UserPlant, plantViewModel: PlantViewModel, selectedDate: Lo
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .padding(40.dp, 20.dp)
+            .absolutePadding(40.dp, 20.dp, 40.dp, 10.dp)
             .clickable {
                 // When clicked, navigate to PlantDetailsPage(id = plant.plantId)
                 navController.navigate(route = "details/${plant.plantId}")

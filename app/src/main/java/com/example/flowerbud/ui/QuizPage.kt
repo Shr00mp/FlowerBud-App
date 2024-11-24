@@ -128,7 +128,6 @@ fun QuizContent(
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
-                .background(color = Color.White)
         ) {
             Row(modifier = modifier.align(alignment = Alignment.CenterHorizontally)) {
                 Text(
@@ -568,7 +567,6 @@ fun ResultsContent(
         Column (
             modifier = modifier
                 .verticalScroll(rememberScrollState())
-                .background(color = Color.White)
                 .padding(10.dp, 0.dp)
         ) {
             Spacer(modifier = Modifier.height(40.dp))
