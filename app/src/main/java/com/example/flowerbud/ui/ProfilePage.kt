@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -58,7 +59,7 @@ fun ProfilePage(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(430.dp)
+//                .height(430.dp)
                 .absolutePadding(50.dp, 50.dp, 50.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
             colors = CardDefaults.cardColors(
@@ -74,12 +75,14 @@ fun ProfilePage(
                     .size(300.dp)
             )
             Spacer(modifier = Modifier.width(15.dp))
-            val username = "Sharon"
 
             Text(
                 "Welcome back, ${uiState.username}.",
                 fontSize = 40.sp,
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                style = TextStyle(lineHeight = 48.sp),
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .absolutePadding(40.dp, 0.dp, 40.dp, 40.dp)
             )
         }
 

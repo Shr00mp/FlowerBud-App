@@ -213,6 +213,14 @@ fun SearchPage(navController: NavController, plantViewModel: PlantViewModel, mod
             selectedPlants.addAll(plants) // Add all plants that fit user search to selectedPlants
         })
         Spacer(modifier = Modifier.padding(0.dp, 15.dp))
+        if (selectedPlants.isEmpty()) {
+            Text("No plants found.",
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .align(alignment = Alignment.CenterHorizontally),
+                fontSize = 20.sp)
+        }
+
         // For each plant that fits user search, display plant card
         for (plant in selectedPlants) {
             PlantCard(plant = plant, navController = navController)

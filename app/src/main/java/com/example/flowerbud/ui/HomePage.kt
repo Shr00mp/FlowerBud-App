@@ -206,6 +206,7 @@ fun NoWaterTasks() {
             verticalArrangement = Arrangement.Center, // Center the content vertically
             modifier = Modifier.align(Alignment.Center)
         ) {
+            Spacer(modifier = Modifier.height(230.dp))
             Image(
                 painter = painterResource(id = R.drawable.watering),
                 contentDescription = "No tasks",

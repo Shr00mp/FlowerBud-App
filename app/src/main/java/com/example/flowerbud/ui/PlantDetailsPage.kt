@@ -139,14 +139,7 @@ fun PlantDetailsPage(id: String?, navController: NavController, plantViewModel: 
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(30.dp))
-
-                    // Description of plant
-//                    Text(
-//                        text = "Description",
-//                        fontSize = 30.sp
-//                    )
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(35.dp))
                     Text(
                         text = plant.description,
                         fontSize = 18.sp

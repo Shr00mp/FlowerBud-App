@@ -31,12 +31,11 @@ fun BottomNavigationBar(
     onTabClick: (PlantScreens) -> Unit, // Handles tab click events
     modifier: Modifier = Modifier
 ) {
-    val lightGreen = colorResource(id = R.color.lightGreen)
+
     val middleGreen = colorResource(id = R.color.middleGreen)
-    val darkGreen = colorResource(id = R.color.darkGreen)
-    val darkBlue = colorResource(id = R.color.darkBlue)
     val darkGrey = colorResource(id = R.color.darkGrey)
     val lightGrey = colorResource(id = R.color.lightGrey)
+
     // Navbar
     NavigationBar(
         containerColor = lightGrey,

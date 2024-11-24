@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Locale
 
+// Class for a plant
 data class Plant(
     val name: String,
     val image: Int,
@@ -32,6 +33,7 @@ data class Plant(
     val issueSolutions: String,
 )
 
+// Dataset of plants
 val allPlants: List<Plant> = listOf(
     Plant("Aloe Vera", R.drawable.aloevera, 10,4, 2,3, true,false,
         R.drawable.sunicon, R.drawable.poundicon, R.drawable.watericon, "1", "1 - 10", "High", "30–60 cm",
@@ -111,6 +113,8 @@ enum class PlantScreens(var title: String) {
     PlantDetails(title = "Plant Details")
 }
 
+// Get plant from the id on the plant details page.
+// id is used for navigation, but the plant needs to be used to provide specific details on the page
 fun idToPlant(id: String?) : Plant {
     for (plant in allPlants) {
         if (plant.plantId == id) {
@@ -122,7 +126,9 @@ fun idToPlant(id: String?) : Plant {
 
 // Class for data stored across different pages (i.e. ui state that can be accessed by entire app)
 data class PlantUiState(
+    // favourites stores all user's favourited plants (added by clicking heart icon on relevant plant details page)
     val favourites: List<String> = emptyList<String>(),
+    // myPlants stores all user's owned plants. It is initialised with a plant that has an overdue watering task (to show this feature on the home page)
     val myPlants: List<UserPlant> = listOf(UserPlant(plantId = "4", waterWeek = 1, lastWateredDates = emptyList(), nextWaterDay = LocalDate.now().minusDays(1), plantName = "Spider Plant", plantImage = R.drawable.spiderplant)),
 
 //    val myPlants: List<UserPlant> = emptyList<UserPlant>()
@@ -140,6 +146,7 @@ data class UserPlant (
     val plantImage: Int,
 )
 
+// Class to store user choices on the quiz page so that they save and don't reset even after leaving and re-entering the page
 data class QuizChoices (
     var priceStart: Int = 0,
     var priceEnd: Int = 50,
@@ -206,6 +213,7 @@ class PlantViewModel: ViewModel() {
         _uiState.update { currentState -> currentState.copy(username = username) }
     }
 
+    // Updates user choices on the quiz page on the viewmodel (so that they are saved)
     fun updatePriceStart(priceStart: Int) {
         val newChoices = _uiState.value.quizChoices.copy(priceStart = priceStart)
         _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
@@ -261,12 +269,14 @@ class PlantViewModel: ViewModel() {
         _uiState.update { currentState -> currentState.copy(quizChoices = newChoices) }
     }
 
+    // Stores images from the journal page onto the viewmodel (so that they are saved)
     fun addImg(img: JournalImg) {
         val updatedImgs = _uiState.value.imgs + img
         _uiState.update { currentState -> currentState.copy(imgs = updatedImgs) }
     }
 }
 
+// Class for an image on the journal page
 data class JournalImg (
     val selectedDate: String,
     val bitmap: Bitmap?,

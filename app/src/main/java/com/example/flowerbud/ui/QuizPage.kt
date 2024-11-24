@@ -94,17 +94,17 @@ fun QuizPage(
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier,
 ) {
-    // var content used to indicate whether quiz or results page should be showing
-    var content by remember{ mutableStateOf("Quiz") }
-    var top5Plants = remember{ mutableStateListOf<Plant>() }
-    if (content == "Quiz") {
+    var content by remember{ mutableStateOf("Quiz") } // Indicates whether quiz or results page should be showing
+    var top5Plants = remember{ mutableStateListOf<Plant>() } // Stores top 5 plants suited to the user based on their quiz choices
+    if (content == "Quiz") { // Show the quiz page
         QuizContent(navController = navController, plantViewModel = plantViewModel, top5Plants, onContentChange = { content = it })
     }
-    else {
+    else { // Show the results page
         ResultsContent(navController = navController, plantViewModel = plantViewModel, top5Plants, onContentChange = { content = it })
     }
 }
 
+// Content for the quiz page
 @Composable
 fun QuizContent(
     navController: NavController,
@@ -124,20 +124,19 @@ fun QuizContent(
         val darkBlue = colorResource(id = R.color.darkBlue)
         val grayColour = colorResource(id = R.color.lightGrey)
 
-
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
         ) {
             Row(modifier = modifier.align(alignment = Alignment.CenterHorizontally)) {
-                Text(
+                Text( // Title text
                     text = "Plant Quiz",
                     fontSize = 40.sp,
                     modifier = Modifier.absolutePadding(0.dp, 40.dp, 0.dp, 15.dp)
                 )
             }
 
-            Text(
+            Text( // Short description of the purpose of the quiz
                 text = "Answer some questions about your plant preferences, and we'll find the best plant " +
                         "for you!",
                 fontSize = 20.sp,
@@ -168,12 +167,13 @@ fun QuizContent(
                     ) {
                         // Price range slider
                         RangeSlider(
+                            // Slider toggle values change to what is stored in the viewmodel. This way, user choices are saved
                             value = uiState.quizChoices.priceStart.toFloat()..uiState.quizChoices.priceEnd.toFloat(),
                             steps = 4,
                             onValueChange = { range ->
                                 run {
-                                    plantViewModel.updatePriceStart(range.start.toInt()) // price_start updates to user's min choice
-                                    plantViewModel.updatePriceEnd(range.endInclusive.toInt()) // price_end updates to user's max choice
+                                    plantViewModel.updatePriceStart(range.start.toInt()) // price_start in viewmodel updates to user's min choice
+                                    plantViewModel.updatePriceEnd(range.endInclusive.toInt()) // price_end in viewmodel updates to user's max choice
                                 }
                             },
                             colors = SliderDefaults.colors(
@@ -183,7 +183,7 @@ fun QuizContent(
                             valueRange = 0f..50f,
                             onValueChangeFinished = {},
                         )
-                        Text(text = "£" + uiState.quizChoices.priceStart.toString() + " to " + "£" + uiState.quizChoices.priceEnd.toString())
+                        Text(text = "£" + uiState.quizChoices.priceStart.toString() + " to " + "£" + uiState.quizChoices.priceEnd.toString()) // Text showing user choices
                     }
                 }
             }
@@ -373,16 +373,19 @@ fun QuizContent(
                             // Yes (for if there are pets) button
                             Button(
                                 onClick = {
-                                    plantViewModel.updateToxicYn(true)
+                                    plantViewModel.updateToxicYn(true) // Viewmodel is updated
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 15.dp, 0.dp)
                                     .width(200.dp),
                                 border = BorderStroke(
+                                    // If this button has been selected, border is green. If not, border is gray
                                     2.dp, if (uiState.quizChoices.toxicYn == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
+                                    // If this button has been selected, the container is green. If not, container is gray
                                     containerColor = if(uiState.quizChoices.toxicYn == true) darkGreen else grayColour,
+                                    // If this button has been selected, the text colour is white. If not, the text colour is gray
                                     contentColor = if(uiState.quizChoices.toxicYn == true) Color.White else Color.Gray
                                 )
                             ) {
@@ -445,18 +448,21 @@ fun QuizContent(
                         ) {
                             // Indoor button
                             Button(
-                                onClick = {
-                                    plantViewModel.updateOutdoor(false)
-                                    plantViewModel.updateIndoor(true)
+                                onClick = { // If "indoor" button is selected
+                                    plantViewModel.updateOutdoor(false) // Outdoor is false
+                                    plantViewModel.updateIndoor(true) // but Indoor is true
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
                                     .width(150.dp),
                                 border = BorderStroke(
+                                    // If the "indoor" button is selected (only true if outdoor is false and indoor is true) then border is dark green. Otherwise, border is gray
                                     2.dp, if (uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
+                                    // If the "indoor" button is selected (only true if outdoor is false and indoor is true) then container colour is dark green. Otherwise, border is gray
                                     containerColor = if(uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) darkGreen else grayColour,
+                                    // If button is selected, content colour is dark green. Otherwise, content colour is gray
                                     contentColor = if(uiState.quizChoices.outdoor == false && uiState.quizChoices.indoor == true) Color.White else Color.Gray
                                 )
                             ) {
@@ -465,14 +471,15 @@ fun QuizContent(
                             Spacer(modifier = Modifier.width(20.dp))
                             // Outdoor button
                             Button(
-                                onClick = {
-                                    plantViewModel.updateOutdoor(true)
-                                    plantViewModel.updateIndoor(false)
+                                onClick = { // If "outdoor" is selected:
+                                    plantViewModel.updateOutdoor(true) // Outdoor is true
+                                    plantViewModel.updateIndoor(false) // but Indoor is false
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
                                     .width(150.dp),
                                 border = BorderStroke(
+                                    // Can determine if "outdoor" button is selected by checking if outdoor is true and indoor is false
                                     2.dp, if (uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == false) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
@@ -486,14 +493,15 @@ fun QuizContent(
 
                             // Either button
                             Button(
-                                onClick = {
-                                    plantViewModel.updateOutdoor(true)
-                                    plantViewModel.updateIndoor(true)
+                                onClick = { // If "either" is selected:
+                                    plantViewModel.updateOutdoor(true) // Both Outdoor
+                                    plantViewModel.updateIndoor(true) // and Indoor are true
                                 },
                                 modifier = Modifier
                                     .absolutePadding(0.dp, 20.dp, 0.dp, 0.dp)
                                     .width(150.dp),
                                 border = BorderStroke(
+                                    // Can determine if "either" button is selected by checking if indoor and outdoor are both true
                                     2.dp, if (uiState.quizChoices.outdoor == true && uiState.quizChoices.indoor == true) darkGreen else Color.Gray
                                 ),
                                 colors = ButtonDefaults.buttonColors(
@@ -549,18 +557,18 @@ fun QuizContent(
     }
 }
 
+// Content for displaying the results of the quiz
 @Composable
 fun ResultsContent(
     navController: NavController,
     plantViewModel: PlantViewModel,
-    top5Plants: MutableList<Plant>,
+    top5Plants: MutableList<Plant>, // Takes in the user's top 5 plants as a parameter
     onContentChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val lightGreen = colorResource(id = R.color.lightGreen)
-    val darkGreen = colorResource(id = R.color.darkGreen)
+
     val darkBlue = colorResource(id = R.color.darkBlue)
-    val grayColour = colorResource(id = R.color.lightGrey)
+
     ConstraintLayout {
         // createRef() used in ConstraintLayout{} to create a reference point, used for anchoring floating Get Results button
         val retakeBtnRef = createRef()
@@ -575,11 +583,11 @@ fun ResultsContent(
                     .padding(20.dp, 0.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ){
-                Text("Your Top 5 Results", fontSize = 40.sp)
+                Text("Your Top 5 Results", fontSize = 40.sp) // Title
             }
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Show plant cards for ever top 5 plant
+            // Show plant cards for every top 5 plant
             for (plant in top5Plants) {
                 PlantCard(plant = plant, navController = navController)
             }

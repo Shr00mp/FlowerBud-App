@@ -57,16 +57,15 @@ fun LoginPage(
     plantViewModel: PlantViewModel,
     modifier: Modifier = Modifier
 ) {
-    val lightGreen = colorResource(id = R.color.lightGreen)
     val darkBlue = colorResource(id = R.color.darkBlue)
 
     // TabRow to display the tabs
     Column(modifier = Modifier.fillMaxWidth()) {
-
         Spacer(modifier = Modifier.height(50.dp))
+        // Image for the app logo
         Image(
             painter = painterResource(id = R.drawable.applogo),
-            contentDescription = "No tasks",
+            contentDescription = "App logo",
             modifier = Modifier
                 .height(150.dp)
                 .aspectRatio(1f)
@@ -74,6 +73,7 @@ fun LoginPage(
                 .align(alignment = Alignment.CenterHorizontally)
         )
         Spacer(modifier = Modifier.height(35.dp))
+        // Welcome to FlowerBud text below app logo
         Text("Welcome to FlowerBud",
             modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
             fontSize = 35.sp)
@@ -97,11 +97,11 @@ fun LoginPage(
                 )
             }
         ) {
-            tabs.forEachIndexed { index, title ->
+            tabs.forEachIndexed { index, title -> // For each tab in the list:
                 Tab(
-                    selected = selectedTab == index,
-                    onClick = { selectedTab = index },
-                    text = {
+                    selected = selectedTab == index, // Determines whether or not tab is selected
+                    onClick = { selectedTab = index }, // When clicked, the tab is selected
+                    text = { // Displays the tab title
                         Text(
                             title,
                             fontSize = 20.sp,
@@ -121,23 +121,23 @@ fun LoginPage(
 
 }
 
-
+// Displayed when the Login tab is selected
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
-    val lightGreen = colorResource(id = R.color.lightGreen)
-    val darkGreen = colorResource(id = R.color.darkGreen)
     val darkBlue = colorResource(id = R.color.darkBlue)
 
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") } // Stores entered username
+    var password by remember { mutableStateOf("") } // Stores entered password
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(20.dp))
+
+        // Username text field
         OutlinedTextField(
             value = username,
-            onValueChange = {username = it},
+            onValueChange = {username = it}, // As user types, the username variable also updates
             leadingIcon = {
-                Icon(Icons.Default.Person, contentDescription = "person")
+                Icon(Icons.Default.Person, contentDescription = "person") // Icon at the front of the text field is a person
             },
             label = {Text(text = "Username")},
             modifier = Modifier
@@ -145,19 +145,18 @@ fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
                 .width(400.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = darkBlue,
-//                unfocusedBorderColor = darkGreen,
                 focusedLabelColor = darkBlue,
-//                unfocusedLabelColor = darkGreen,
                 focusedLeadingIconColor = darkBlue,
-//                unfocusedLeadingIconColor = darkGreen
             ),
         )
         Spacer(modifier = Modifier.height(15.dp))
+
+        // Password text field
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = {password = it}, // As user types, the password variable also updates
             leadingIcon = {
-                Icon(Icons.Default.Lock, contentDescription = "lock")
+                Icon(Icons.Default.Lock, contentDescription = "lock") // Icon at the front of the text field is a lock
             },
             label = {Text(text = "Password")},
             modifier = Modifier
@@ -165,28 +164,27 @@ fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
                 .width(400.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = darkBlue,
-//                unfocusedBorderColor = darkGreen,
                 focusedLabelColor = darkBlue,
-//                unfocusedLabelColor = darkGreen,
                 focusedLeadingIconColor = darkBlue,
-//                unfocusedLeadingIconColor = darkGreen
             ),
         )
-        var errorMessage by remember { mutableStateOf("") }
-        ErrorMessage(errorMessage = errorMessage)
+
+        var errorMessage by remember { mutableStateOf("") } // At first, there is no error message
+        ErrorMessage(errorMessage = errorMessage) // Show error message
         Spacer(modifier = Modifier.height(50.dp))
+
+        // Login button
         Button(
             onClick = {
-                errorMessage = getErrorMessage(
+                errorMessage = getErrorMessage( // Get the right error message
                     type = "Log in",
                     username = username,
                     password = password,
                     confirmPassword = "")
-                if (errorMessage == "") {
-                    plantViewModel.addUser(username)
-                    navController.navigate(route = PlantScreens.Home.title)
+                if (errorMessage == "") { // If there is no error
+                    plantViewModel.addUser(username) // Update the viewmodel with the username to be displayed on the profile page
+                    navController.navigate(route = PlantScreens.Home.title) // Navigate to the home page
                 }
-                // Check for unentered fields, if username password match, if there is user with this username
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = darkBlue,
@@ -203,27 +201,28 @@ fun LoginContent(navController: NavController, plantViewModel: PlantViewModel) {
 
 }
 
+// Helper function to determine what the error message should be
 fun getErrorMessage(type: String, username: String, password: String, confirmPassword: String): String {
     var errorMessage = ""
-    if (username == "") {
+    if (username == "") { // If username has not been entered
         errorMessage = "Please enter a username."
     }
-    else if (password == "") {
+    else if (password == "") { // If passowrd has not been enetered
         errorMessage = "Please enter a password"
     }
-    else if (type == "Sign up") {
-        if (password != confirmPassword) {
+    else if (type == "Sign up") { // If the sign up tab is selected and
+        if (password != confirmPassword) { // the passwords do not match
             errorMessage = "Passwords do not match"
         }
     }
     return errorMessage
-    // For login: Check if there is existing user with username and if username and passwords match
 }
 
+// Function for displaying the error message
 @Composable
 fun ErrorMessage(errorMessage: String) {
     val red = colorResource(id = R.color.red)
-    if (errorMessage != "") {
+    if (errorMessage != "") { // If error message is empty, nothing shows
         Spacer(modifier = Modifier.height(50.dp))
         Column (modifier = Modifier.fillMaxWidth()) {
             Card (
@@ -252,21 +251,22 @@ fun ErrorMessage(errorMessage: String) {
     }
 }
 
+// Displayed when the Login tab is selected
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupContent(navController: NavController, plantViewModel: PlantViewModel) {
-    val lightGreen = colorResource(id = R.color.lightGreen)
-    val darkGreen = colorResource(id = R.color.darkGreen)
+
     val darkBlue = colorResource(id = R.color.darkBlue)
 
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") } // Stores entered username
+    var password by remember { mutableStateOf("") } // Stores entered password
+    var confirmPassword by remember { mutableStateOf("") } // Stores entered second password (for confirmation)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
             value = username,
-            onValueChange = {username = it},
+            onValueChange = {username = it}, // As user types, the username also updates
             leadingIcon = {
                 Icon(Icons.Default.Person, contentDescription = "person")
             },
@@ -276,17 +276,14 @@ fun SignupContent(navController: NavController, plantViewModel: PlantViewModel) 
                 .width(400.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = darkBlue,
-//                unfocusedBorderColor = darkGreen,
                 focusedLabelColor = darkBlue,
-//                unfocusedLabelColor = darkGreen,
                 focusedLeadingIconColor = darkBlue,
-//                unfocusedLeadingIconColor = darkGreen
             ),
         )
         Spacer(modifier = Modifier.height(15.dp))
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = {password = it}, // As the user types, the password also updates
             leadingIcon = {
                 Icon(Icons.Default.Lock, contentDescription = "lock")
             },
@@ -296,17 +293,14 @@ fun SignupContent(navController: NavController, plantViewModel: PlantViewModel) 
                 .width(400.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = darkBlue,
-//                unfocusedBorderColor = darkGreen,
                 focusedLabelColor = darkBlue,
-//                unfocusedLabelColor = darkGreen,
                 focusedLeadingIconColor = darkBlue,
-//                unfocusedLeadingIconColor = darkGreen
             ),
         )
         Spacer(modifier = Modifier.height(15.dp))
         OutlinedTextField(
             value = confirmPassword,
-            onValueChange = {confirmPassword = it},
+            onValueChange = {confirmPassword = it}, // As the user types, the confirmation password also updates
             leadingIcon = {
                 Icon(Icons.Default.Lock, contentDescription = "lock")
             },
@@ -316,26 +310,26 @@ fun SignupContent(navController: NavController, plantViewModel: PlantViewModel) 
                 .width(400.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = darkBlue,
-//                unfocusedBorderColor = darkGreen,
                 focusedLabelColor = darkBlue,
-//                unfocusedLabelColor = darkGreen,
                 focusedLeadingIconColor = darkBlue,
-//                unfocusedLeadingIconColor = darkGreen
             ),
         )
-        var errorMessage by remember { mutableStateOf("") }
-        ErrorMessage(errorMessage = errorMessage)
+
+        var errorMessage by remember { mutableStateOf("") } // There is no error message at first
+        ErrorMessage(errorMessage = errorMessage) // Display the error message
         Spacer(modifier = Modifier.height(50.dp))
+
+        // Sign up button
         Button(
             onClick = {
-                errorMessage = getErrorMessage(
+                errorMessage = getErrorMessage( // Get the right error message
                     type = "Sign up",
                     username = username,
                     password = password,
                     confirmPassword = confirmPassword)
-                if (errorMessage == "") {
-                    navController.navigate(route = PlantScreens.Home.title)
-                    plantViewModel.addUser(username)
+                if (errorMessage == "") { // If there is no error message
+                    plantViewModel.addUser(username) // Update the viewmodel with the new username so that it can be displayed on the profile page
+                    navController.navigate(route = PlantScreens.Home.title) // Navigate to the home page
                 }
             },
             colors = ButtonDefaults.buttonColors(
